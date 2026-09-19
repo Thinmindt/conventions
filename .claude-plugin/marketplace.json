@@ -1,0 +1,12 @@
+{
+  "name": "conventions",
+  "owner": { "name": "Thinmindt" },
+  "description": "How code is written in every project, whatever the machine: the Python style guide and the traps",
+  "plugins": [
+    {
+      "name": "conventions",
+      "source": "./",
+      "description": "The Python style guide, the design-document rule, and the traps each paid for once"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "conventions",
+  "version": "1.0.0",
+  "author": { "name": "Thinmindt" },
+  "description": "Conventions for every project: the Python style guide (with the rule for design documents) and python-traps, the rules for threads, files, services and public repos that were each paid for once.",
+  "repository": "https://github.com/Thinmindt/conventions"
+}
