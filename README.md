@@ -1,7 +1,7 @@
 # conventions
 
 A Claude Code plugin carrying how code is written in every project, whatever machine it runs on.
-Two skills, loaded when the work calls for them:
+Three skills, loaded when the work calls for them:
 
 - **python-style** — the Python style guide: naming over narration, what a comment may say,
   docstrings, logging, interfaces versus internals, errors, tests, tooling, and how to write a
@@ -11,6 +11,14 @@ Two skills, loaded when the work calls for them:
   else's thread, files that must survive a crash, network filesystems, services under systemd,
   uv with apt-only packages, and what may go in a public repository. Each names the failure it
   prevents; each was paid for once.
+- **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
+  the code and the machine, current (plans are the plan as it stands, history archived), each
+  fact in one place, nothing private, nothing tied to one installation or one person's settings.
+
+A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
+`docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the
+last audit is kept per project under `${XDG_STATE_HOME:-~/.local/state}/conventions/doc-audit/`,
+outside the project, so it never shows up in a diff.
 
 ## Installing
 
