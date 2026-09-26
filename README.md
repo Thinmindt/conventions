@@ -4,8 +4,9 @@ A Claude Code plugin carrying how code is written in every project, whatever mac
 Three skills, loaded when the work calls for them:
 
 - **python-style** — the Python style guide: naming over narration, what a comment may say,
-  docstrings, logging, interfaces versus internals, errors, tests, tooling, and how to write a
-  design document so it is still true months later. The skill body *is* the guide; a new project
+  docstrings, logging, interfaces versus internals (hardware behind a boundary), errors, tests,
+  tooling, how to write a design document so it is still true months later, and how to keep a
+  roadmap the plan as it stands. The skill body *is* the guide; a new project
   copies it to `docs/STYLE.md` so people can read it without Claude.
 - **python-traps** — rules for code that runs unattended: threads and locks, callbacks on someone
   else's thread, files that must survive a crash, network filesystems, services under systemd,
@@ -14,6 +15,8 @@ Three skills, loaded when the work calls for them:
 - **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
   the code and the machine, current (plans are the plan as it stands, history archived), each
   fact in one place, nothing private, nothing tied to one installation or one person's settings.
+  It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
+  unchanged; a project adds its own terms with `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the

@@ -137,9 +137,10 @@ questions, and knowing it lends a stranger false familiarity. Commit author line
 as the files, so a personal address in `git config user.email` publishes itself on every commit.
 
 **Enforce it with a check, not a habit.** Keep the private terms in a gitignored file and have
-the project's check script fail when one appears in a tracked or about-to-be-added file, or in
+the project's gate script fail when one appears in a tracked or about-to-be-added file, or in
 the message or author of a commit no remote has yet (`git log HEAD --not --remotes`). Without the
-file, as on CI, the check passes and says nothing is configured.
+file, as on CI, the check passes and says nothing is configured. The doc-audit skill carries the
+script to copy, and how a project adds terms of its own.
 
 **Nothing tracked may depend on one person's settings.** A rule that holds because of how the
 owner configured git, their shell, their paths or their hardware is false for the next

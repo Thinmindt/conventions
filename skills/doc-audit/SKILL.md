@@ -29,6 +29,16 @@ nobody opens:
 - **Companion repositories** the docs send a reader to: plugins, kits, templates. Their install
   instructions are part of this project's documentation.
 
+An untracked document has no copy off the machine unless something makes one. Note how each is
+backed up, and report any that is not.
+
+## The project's own rules
+
+Read the project's agent guide (`CLAUDE.md`) for documentation rules of its own — how its
+roadmap is numbered, what must be backed up after an edit, which pages need a screenshot — and
+apply them alongside the checks below. Run every check script the project has; its privacy
+check in particular (below) is where project-specific private terms are defined.
+
 ## The checks
 
 Run each check over each document. Fix what is yours to fix; collect what is not for the report.
@@ -69,12 +79,25 @@ Where two documents disagree, reality decides, not the newer document.
 Two statements of one fact are a contradiction waiting to happen: keep the one in the right home
 and cut or point the other. Rationale found in a source comment moves to the design document.
 
-**Safe to publish.** Tracked files, commit messages and commit authors are public. Run the
-project's private-terms check if it has one; otherwise grep the tracked tree and the unpushed
-commits (`git log HEAD --not --remotes`, messages and author lines) for addresses, hostnames,
-share names, account names, absolute home paths, tokens, email addresses, and people's and pets'
-names. Anything private moves to a gitignored file. If it has already been pushed, report it;
-rewriting pushed history is the owner's decision.
+**Safe to publish.** Tracked files, commit messages and commit authors are public. Look for
+network addresses, hostnames, share names, tokens, personal email addresses, and people's and
+pets' names; anything private moves to a gitignored file. If it has already been pushed, report
+it; rewriting pushed history is the owner's decision.
+
+Every public project carries the check that enforces this, `scripts/check_private.sh`, copied
+unchanged from `check_private.sh` in this skill's directory and run first by the project's gate
+script. It fails when a term appears in a tracked or about-to-be-added file, or in the author,
+committer or message of a commit no remote has yet. Its terms come from two places:
+
+- `.private-terms`, gitignored, one per line: the addresses, hostnames and tokens of this
+  installation. Add to it whenever a new one turns up.
+- `scripts/private_terms.sh`, tracked and optional: the project's own rule for terms that live
+  elsewhere, printed one per line. CatDetector's prints the cats' names from `CAT_NAMES` in
+  `.env`, so the names are private without being written down twice.
+
+Without either, as on CI or in a fresh clone, the check passes and says nothing is configured.
+If the project's copy has drifted from the template, bring it back and move the difference into
+`private_terms.sh`. A project with no copy gets one as part of the audit.
 
 **General.** A stranger with different hardware and different settings should be able to follow
 every tracked document. Look for:
@@ -87,10 +110,14 @@ every tracked document. Look for:
   "this installation uses X; Y also works because…", and say which choices would change how
   well the project works.
 - Examples that use real names. Use made-up ones.
+- Hardware outside its boundary (python-style, "Hardware sits behind a boundary"). Every
+  device library should be importable only inside its implementation, with the linter enforcing
+  it; grep for its imports elsewhere, and for device-specific values (models, modes, formats,
+  sizes) in code or docs that are not that implementation's.
 
 **Consistent with the conventions.** Comments and docstrings follow python-style; design entries
 give what, why and when; a project's `docs/STYLE.md` still matches the python-style skill below
-its front matter.
+its front matter: `diff <(tail -n +6 <plugin>/skills/python-style/SKILL.md) docs/STYLE.md`.
 
 ## How to run it
 
