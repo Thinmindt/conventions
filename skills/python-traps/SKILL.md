@@ -131,6 +131,22 @@ particular machine.
 first push, grep every added line in history, not just the working tree. Rewriting unpushed
 commits is free; rewriting pushed ones is not.
 
+**Personal details are private too.** People's and pets' names, a personal email address, an
+account name, an absolute home path. A pet's name is a common answer to account-recovery
+questions, and knowing it lends a stranger false familiarity. Commit author lines are as public
+as the files, so a personal address in `git config user.email` publishes itself on every commit.
+
+**Enforce it with a check, not a habit.** Keep the private terms in a gitignored file and have
+the project's gate script fail when one appears in a tracked or about-to-be-added file, or in
+the message or author of a commit no remote has yet (`git log HEAD --not --remotes`). Without the
+file, as on CI, the check passes and says nothing is configured. The doc-audit skill carries the
+script to copy, and how a project adds terms of its own.
+
+**Nothing tracked may depend on one person's settings.** A rule that holds because of how the
+owner configured git, their shell, their paths or their hardware is false for the next
+contributor. Make it a check the repository runs, or state it as a requirement for everyone.
+Examples and tests use made-up names, never the installation's own.
+
 **A design document that cites private documents is half a document.** If the design doc cites
 the roadmap, publish the roadmap, scrubbed, or the reader has the conclusions and not the plan.
 
