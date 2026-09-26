@@ -23,6 +23,13 @@ A session-start hook reminds Claude to offer the audit when a project with a `CL
 last audit is kept per project under `${XDG_STATE_HOME:-~/.local/state}/conventions/doc-audit/`,
 outside the project, so it never shows up in a diff.
 
+## Checks
+
+`scripts/check.sh` runs every gate, locally and in CI: the privacy check (and that its copy still
+matches the template), the JSON files parse, shellcheck, codespell, and `scripts/test_scripts.sh`,
+which exercises `doc-audit.sh` and `check_private.sh` in throwaway directories. It needs `uv`; the
+tools run through `uvx` at pinned versions.
+
 ## Installing
 
 ```
