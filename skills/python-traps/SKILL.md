@@ -1,6 +1,6 @@
 ---
 name: python-traps
-description: Rules for Python that runs unattended — threads and locks, callbacks on someone else's thread, files that must survive a crash, network filesystems, services under systemd, uv with apt-only packages, and what may go in a public repository. Each rule names the failure it prevents. Use when writing or reviewing threaded code, a callback or consumer, a file write that a reader may see early, a long-running service or its unit file, a venv that depends on system packages, or anything about to be pushed to a public repository.
+description: Rules for Python that runs unattended — threads and locks, callbacks on someone else's thread, files that must survive a crash, network filesystems, services under systemd and processes that exit themselves, secrets in logs, uv with apt-only packages, and what may go in a public repository. Each rule names the failure it prevents. Use when writing or reviewing threaded code, a callback or consumer, a file write that a reader may see early, a long-running service or its unit file, a watchdog or other self-exit, a secret URL that could reach a log, a venv that depends on system packages, or anything about to be pushed to a public repository.
 ---
 
 # Python traps
@@ -90,6 +90,21 @@ corrupts it. Leave the old file alone, write to a timestamped sibling, log a war
 the process on the spot: open files stay `.part`, queues are lost, nothing is flushed. Install a
 handler that raises `SystemExit` on the main thread so the `finally` blocks run, and have it
 ignore further SIGTERMs so a second one cannot interrupt the cleanup.
+
+**A process that exits on its own needs its own deadline.** A service manager's stop timeout
+(systemd's `TimeoutStopSec`) bounds only the stops it starts. A watchdog or fatal-error path
+that raises `SystemExit` runs the same cleanup and then every library's `atexit` handlers, and
+either can wait forever on the very thing that failed: a library that joins its worker thread
+without a timeout, a flush that needs a dead device. Nothing kills a process that is not being
+stopped, so the outage the watchdog exists to end comes back. Before raising, arm a daemon
+`threading.Timer` that calls `os._exit(code)`, and ignore SIGTERM from then on, so a stop that
+arrives mid-cleanup cannot interrupt it or turn the exit code into 0.
+
+**Exception text can carry a secret URL.** HTTP clients quote the URL, or its path, in some error
+messages (`http.client.InvalidURL` does), and `log.exception` prints the message in its
+traceback. Where the URL holds a token, log the status code or the error's type instead, refuse
+a malformed URL at startup without echoing it, and test that a failure's log line does not
+contain it.
 
 **Degrade at startup rather than die.** If one component cannot be constructed — a database that
 will not open, a device that is busy — bring up the rest with a warning. The web page that
