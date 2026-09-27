@@ -23,6 +23,11 @@ A session-start hook reminds Claude to offer the audit when a project with a `CL
 last audit is kept per project under `${XDG_STATE_HOME:-~/.local/state}/conventions/doc-audit/`,
 outside the project, so it never shows up in a diff.
 
+## Plans
+
+What comes next is in [docs/ROADMAP.md](docs/ROADMAP.md). How this plugin compares with published
+agentic-engineering practice is in [docs/survey-2026-09.md](docs/survey-2026-09.md), as of that date.
+
 ## Checks
 
 `scripts/check.sh` runs every gate, locally and in CI: the privacy check (and that its copy still
