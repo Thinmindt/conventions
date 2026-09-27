@@ -267,8 +267,9 @@ follow the `languages` answer.
   "enforced by" lines name each language's linter.
 
 **Done means:** a session touching a C# file loads no Python skill and does load `style` and
-`traps` (an eval case, §5); once §18, §19 and §20 exist, a project generated with two languages has
-a gate that runs both toolchains and passes on a fresh tree, covered by `scripts/test_scripts.sh`.
+`traps` (an eval case, §5); once §18, §19 and §20 exist, a project generated with two languages
+has a gate that runs both toolchains and passes on a fresh tree, covered by
+`scripts/test_scripts.sh`.
 
 ## 18. The JavaScript and TypeScript gate
 

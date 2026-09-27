@@ -64,12 +64,12 @@ pinned dev dependency by a task) and the hardware boundary. Every project gets t
 the CI workflow that runs it, the privacy check and a pre-push hook that refuses a push carrying a
 private term, an agent guide, and a one-line `docs/STYLE.md` that links to the guide instead of
 carrying a copy; a Python project also gets `ruff.toml` with the guide's rules. The gate's steps
-for the other languages arrive with roadmap §17. The answers live in `.copier-answers.yml`. A
-generated file is never edited by hand: a project-specific need is an answer, or a change to the
-template. `scripts/private_terms.sh` is the project's own and survives every update. `--trust` is
-needed because the template's tasks install the hook and ignore `.private-terms`. Copier reads only
-`v<version>` tags, so a project updates to the newest release, and a session-start hook says when a
-project is behind the installed plugin.
+for the other languages arrive with roadmap §18, §19 and §20. The answers live in
+`.copier-answers.yml`. A generated file is never edited by hand: a project-specific need is an
+answer, or a change to the template. `scripts/private_terms.sh` is the project's own and survives
+every update. `--trust` is needed because the template's tasks install the hook and ignore
+`.private-terms`. Copier reads only `v<version>` tags, so a project updates to the newest release,
+and a session-start hook says when a project is behind the installed plugin.
 
 ## Updating
 
