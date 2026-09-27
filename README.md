@@ -63,10 +63,11 @@ This project follows [the conventions style guide](https://github.com/Thinmindt/
 
 A change to `skills/`, `hooks/` or `agents/` bumps `version` in `.claude-plugin/plugin.json`;
 the gate compares both with `origin/main` and refuses the change if the version stayed. Once the
-change is on main, tag the release from a clean checkout of it:
+change is on main, tag the release from a clean checkout of it, as `v<version>`, which is the
+form Copier reads (roadmap §7):
 
 ```
-claude plugin tag --push
+git tag -a v1.3.0 -m "conventions 1.3.0" && git push origin v1.3.0
 ```
 
 Then on each machine:
@@ -84,3 +85,10 @@ would use: the things being written, the libraries, the file types. Then `Use wh
 situations. Then, where a near miss is likely, what it does not cover. It does not summarise the
 body, and it stays under 1024 characters, the limit Claude Code enforces. The three skills here
 are the pattern; a description that reads well but names no situation will not load.
+
+The body is loaded whole on every trigger, so it holds only what needs a reader. For each
+paragraph, in order: can a machine check it? Then it is a linter rule or a check, and the skill
+keeps one line saying so. Must it happen every time? Then it is a hook. Is it a procedure with
+steps? Then it is a script whose output the skill interprets, or a subagent. Is it judgement?
+Then it stays, as the rule and the failure it prevents. What is left is explanation for people,
+which goes in a reference file beside the skill, named by it and read on demand.

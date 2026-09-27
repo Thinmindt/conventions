@@ -5,34 +5,42 @@ change that earns it. Finished items move verbatim to `ROADMAP-archive.md` under
 with the date they moved. Numbers never change. The reasoning behind most entries is in
 [survey-2026-09.md](survey-2026-09.md).
 
-The numbers give the intended order. 8 keeps one box open, waiting on §7. 5 comes before the new
-skills (6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after what they
-hold out and measure (5, 6, 11).
+The numbers give the intended order. 7 is the spine: it is where everything that leaves the
+skills (3, 4, 12) lands, so its first version comes before those. 5 comes before the new skills
+(6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after what they hold
+out and measure (5, 6, 11).
 
-## 3. Move the documentation rules out of python-style
+## 3. Reduce each skill to what needs a reader
 
-Design documents, plans and the roadmap rule apply in every language. A session with no Python
-has no reason to load a skill called python-style.
+A skill body is loaded whole on every trigger, so it should hold only what a reader has to apply:
+judgement. The README's "Writing a skill" gives the four questions that decide where each
+paragraph goes. Applied to the three skills:
 
-- [ ] New skill `docs-style`: "Design documents" and "Plans" from python-style, moved verbatim.
-  python-style keeps a one-line pointer to it.
-- [ ] Update the cross-references in doc-audit and the README, and have the `docs/STYLE.md` line
-  link both skills.
-- [ ] If the context-cost measurement (§5) shows python-style's load is the expensive part, move
-  the Tooling section into a reference file the skill names and Claude reads on demand, so the
-  body is the rules. Not before the measurement.
+- [ ] What a linter checks leaves python-style for the template's `ruff.toml` (§7, §12), and the
+  skill keeps one line per rule saying so.
+- [ ] What must happen every time becomes a hook (§4), and the skill stops asking for it.
+- [ ] Procedures become scripts: `doc-audit.sh inventory` prints the document list the skill now
+  describes in prose. The audit itself is the strongest case for a subagent that runs in its own
+  context with restricted tools; decide that when §10 exists.
+- [ ] Explanation for people, the reasoning and the worked examples, moves to a reference file
+  beside each skill that the skill names and Claude reads on demand. `docs/STYLE.md` links to it.
+- [ ] Design documents and plans apply in every language, so they leave python-style for a skill
+  `docs-style`, moved verbatim; python-style keeps a one-line pointer.
+- [ ] Record each skill's context cost (§5) before and after, so the cut is measured.
 
-**Done means:** python-style mentions no document type other than docstrings and comments. An eval
-case (§5) shows `docs-style` loading when a design document is edited in a project with no Python.
+**Done means:** each skill body is rules with the failure each prevents; no body states what a
+check in §7's template enforces; python-style mentions no document type other than docstrings and
+comments. An eval case (§5) shows `docs-style` loading when a design document is edited in a
+project with no Python, and the cost table in `evals/results/` shows the before and after.
 
 ## 4. Enforce at the moment of change
 
 Skills are guides. The only sensor is the gate, and it runs when someone runs it. Start with the
 rule whose failure is costliest to undo.
 
-- [ ] A git pre-push hook that runs `scripts/check_private.sh`, installed by the project bootstrap
-  (§7). The repository is the right place for a push gate: it holds for every tool and every
-  person, not only a Claude session.
+- [ ] A git pre-push hook that runs `scripts/check_private.sh`, written into the project by the
+  template and installed by its task (§7). The repository is the right place for a push gate: it
+  holds for every tool and every person, not only a Claude session.
 - [ ] `check_private.sh` reads the working tree and the messages of unpushed commits, not their
   content. A term committed and removed again before the push still lives in history, so the check
   also scans the content of unpushed commits (`git log -p HEAD --not --remotes`). The template
@@ -92,39 +100,49 @@ Claude Code team write the lesson back as part of the work.
 **Done means:** after a correction in a project session, invoking the skill leaves a branch here
 that has the new entry in the chosen file and passes `scripts/check.sh`.
 
-## 7. Set up a project, and check it for drift
+## 7. Set up a project from a Copier template, and keep it updated
 
-A project takes one copied file from this plugin, `check_private.sh`, and writing it, the gate
-skeleton and the CI workflow is manual. (`docs/STYLE.md` used to be a copy too; it is now one
-line linking to the guide, so it cannot drift.)
+Everything a project takes from this repository, the gate, the linter rules, the privacy check,
+the CI workflow, the pre-push hook and the agent guide, is generated from one Copier template
+that lives here beside the plugin, and re-generated when the template moves. Per-project
+configuration is expected to grow, and Copier's answers file is where it grows: a question in
+`copier.yml`, an answer in the project, never an edit to a generated file. This is the spine the
+rest of the roadmap hangs on: what leaves the skills (§3, §4, §12) lands here.
 
-- [ ] A plugin executable, `bin/conventions-project`.
-  - `init` writes the files a project takes from this plugin: the one-line `docs/STYLE.md`,
-    `scripts/check_private.sh`, a `scripts/check.sh` skeleton, the CI workflow, the pre-push hook
-    (§4) and a short agent guide (§8).
-  - `check` reports a `check_private.sh` that differs from its template and exits non-zero.
-- [ ] Have doc-audit run `conventions-project check`.
+Facts from a scratch run of Copier 9.18 that shape the design: it reads only PEP 440 tags, so
+releases are tagged `v<version>` and `claude plugin tag`'s format is invisible to it; `copier
+update` looks for `.copier-answers.yml` by that name unless told otherwise, so the default name
+stays; a three-line generated file conflicted on update when the project had edited one line and
+the template another, so generated files are never hand-edited.
 
-**Done means:** `init` in an empty git repository gives a project whose `scripts/check.sh` passes.
-After one line of its `scripts/check_private.sh` is edited, `check` names that file and fails.
-Both are covered by `scripts/test_scripts.sh`.
+- [ ] `copier.yml` at the root with `_subdirectory: template`, so the plugin's files and the
+  template's do not mix. `_min_copier_version` pinned. Questions to start: `project_name`,
+  `python` (yes/no), `hardware_module` (the one module that may import the device library, empty
+  for none), `private_terms` (whether the project prints its own terms). Each later question
+  arrives with the template change that needs it.
+- [ ] `template/` renders: `scripts/check.sh` (the gate, sized to the answers), `scripts/
+  check_private.sh` (moved here from the doc-audit skill, which points at it; this repository's
+  `scripts/` copy is compared with the template's), `ruff.toml` carrying the guide's rules and the
+  hardware boundary from the answer (§12), `.github/workflows/check.yml`, `scripts/githooks/
+  pre-push` (§4), a short `AGENTS.md` pointing at `docs/STYLE.md` and the gate, the one-line
+  `docs/STYLE.md`, and `.copier-answers.yml`. `scripts/private_terms.sh` is under
+  `_skip_if_exists`, so a project's own version survives every update.
+- [ ] A task (`_tasks`, so `--trust`) sets `core.hooksPath` to `scripts/githooks`, which installs
+  the pre-push hook without touching `.git/hooks` by hand.
+- [ ] The rule, stated in the project's generated `AGENTS.md` and in the README here: a generated
+  file is never edited by hand; a project-specific need becomes an answer or a template change.
+- [ ] Commands, in the README here: `uvx copier copy gh:Thinmindt/conventions .` to set up, `uvx
+  copier update --defaults` to bring a project to the newest tag, both pinned to a Copier version.
+- [ ] The session-start hook compares `_commit` in a project's `.copier-answers.yml` with the
+  plugin's version and says when the project is behind, the way the doc audit reminder works.
+- [ ] `scripts/test_scripts.sh` copies the template into a throwaway repository with default
+  answers and runs the generated gate; then edits the template, tags, updates, and shows the
+  project's `private_terms.sh` untouched and the generated files moved.
 
-## 8. An agent guide here, and AGENTS.md for other tools
-
-This repository's agent guide is `AGENTS.md` alone. Claude Code reads an `AGENTS.md` when no
-`CLAUDE.md` is in the working directory or above it, and `claude plugin validate --strict` (§1)
-refuses a `CLAUDE.md` at a plugin root, so one file serves every tool. Projects touched by Codex,
-Copilot, Warp or Cursor still get none of these conventions until `init` (§7) writes them one.
-
-- [x] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, the
-  version rule as §13 settles it, keep `check_private.sh` identical to its template, and where
-  plans and the survey live. No `CLAUDE.md`, here or in any directory above a checkout, since
-  one would hide `AGENTS.md` from Claude Code.
-- [ ] The agent guide that `conventions-project init` writes (§7) follows the same shape and points
-  at `docs/STYLE.md`, so tools other than Claude Code read the conventions too.
-
-**Done means:** `AGENTS.md` exists, is under 60 lines, and nothing in it is also stated in the
-README.
+**Done means:** a fresh project made with one `copier copy` has a passing gate, a working pre-push
+hook and an agent guide, with no hand edits; after a template change and a tag, `copier update` in
+that project brings the change in and touches nothing the project owns; the session-start hook
+names a project that is behind. All three are covered by `scripts/test_scripts.sh`.
 
 ## 9. How a change is carried out
 
@@ -186,14 +204,14 @@ not name them. A rule a linter enforces needs no agent to remember it.
   - f-string logging → G004
   - `except Exception` → BLE001
   - banned device imports → TID251
-- [ ] A recommended `[tool.ruff.lint]` block in python-style's Tooling section, which `init` (§7)
-  copies.
+- [ ] The rules as a `ruff.toml` in the template (§7), rendered with the hardware boundary from
+  the project's answers; python-style points at it rather than carrying the block.
 - [ ] Rules no ruff rule covers, such as a bare `noqa` without a reason or an unbounded
   `join()`, are listed as candidates for a small check. Each check prints how to fix the problem,
   not only where it is.
 
 **Done means:** every rule in both skills is marked either with the linter that enforces it or as
-judgement. A project seeded by `init` fails its gate on `log.info(f"...")`.
+judgement. A project generated by the template (§7) fails its gate on `log.info(f"...")`.
 
 ## 14. Traps for running agents unattended
 
