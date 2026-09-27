@@ -19,9 +19,10 @@ Three skills, loaded when the work calls for them:
   unchanged; a project adds its own terms with `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
-`docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the
-last audit is kept per project under `${XDG_STATE_HOME:-~/.local/state}/conventions/doc-audit/`,
-outside the project, so it never shows up in a diff.
+`docs/` directory has changed by more than 500 lines since its last audit, or has no audit
+recorded (`DOC_AUDIT_CHANGED_LINES` changes the threshold). An audit is recorded by a
+`Doc-Audit: <date>` trailer on the commit that carries it, so it travels with the repository and
+nothing is written outside the tree.
 
 ## Plans
 

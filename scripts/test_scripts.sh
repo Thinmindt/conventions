@@ -17,18 +17,33 @@ expect() {
     fi
 }
 
-# doc-audit.sh: silent without docs, reminds when nothing is recorded or the audit is stale.
+# doc-audit.sh: silent without docs; reminds when no audit commit is reachable, is quiet right
+# after one, reminds once enough has changed since it, and says so when a shallow clone hides it.
 audit=$root/skills/doc-audit/doc-audit.sh
-export XDG_STATE_HOME=$work/state
+expect "doc-audit: mark prints the trailer" "Doc-Audit: $(date +%F)" "$(bash "$audit" mark)"
 mkdir -p "$work/nodocs" "$work/project/docs"
 expect "doc-audit: no docs, no reminder" "" "$(CLAUDE_PROJECT_DIR=$work/nodocs bash "$audit" check)"
 export CLAUDE_PROJECT_DIR=$work/project
-expect "doc-audit: none recorded, reminder" yes "$(bash "$audit" check | grep -q 'No documentation audit' && echo yes)"
-bash "$audit" mark >/dev/null
-expect "doc-audit: just marked, no reminder" "" "$(bash "$audit" check)"
-stamp=$(find "$XDG_STATE_HOME" -type f)
-echo "$(($(date +%s) - 40 * 86400)) 2000-01-01" >"$stamp"
-expect "doc-audit: 40 days old, reminder" yes "$(bash "$audit" check | grep -q '40 days ago' && echo yes)"
+reminder() { bash "$audit" check | grep "$1" >/dev/null && echo yes; }
+expect "doc-audit: docs but no repository, reminder" yes "$(reminder 'No documentation audit')"
+git -C "$work/project" init -q -b main
+git -C "$work/project" config user.name Tester
+git -C "$work/project" config user.email tester@example.org
+seq 20 >"$work/project/docs/notes.md"
+git -C "$work/project" add -A
+git -C "$work/project" commit -q -m "first"
+expect "doc-audit: no audit commit, reminder" yes "$(reminder 'No documentation audit')"
+git -C "$work/project" commit -q --allow-empty -m "Audit the documentation" \
+    --trailer "$(bash "$audit" mark)"
+expect "doc-audit: just audited, no reminder" "" "$(bash "$audit" check)"
+seq 21 32 >>"$work/project/docs/notes.md"
+expect "doc-audit: 12 lines changed, under the threshold" "" "$(bash "$audit" check)"
+expect "doc-audit: past the threshold, reminder with date and count" yes \
+    "$(DOC_AUDIT_CHANGED_LINES=10 reminder "audit of $(date +%F), 12 lines of tracked files")"
+git -C "$work/project" commit -q -am "more notes"
+git clone -q --depth 1 "file://$work/project" "$work/shallow"
+expect "doc-audit: shallow clone hides the audit, cannot tell" yes \
+    "$(CLAUDE_PROJECT_DIR=$work/shallow reminder 'shallow clone')"
 unset CLAUDE_PROJECT_DIR
 
 # check_private.sh: passes with no terms, fails on a term in a file or an unpushed commit.

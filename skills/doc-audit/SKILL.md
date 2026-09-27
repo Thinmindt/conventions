@@ -7,7 +7,7 @@ description: A hard look at every document in a project — tracked docs, local 
 
 Documents rot quietly: the code moves on, a plan is half done, a number was true on the day it
 was measured, and a fact written in two places is soon true in one. This audit finds that rot and
-fixes it, on a schedule rather than by accident. Every document should come out of it:
+fixes it, once enough has changed rather than by accident. Every document should come out of it:
 
 1. **True** — it matches the code, the data and the machine as they are today.
 2. **Current** — a plan is the plan as it stands; finished work and history have moved out.
@@ -138,15 +138,28 @@ Group the findings:
   rewrites.
 - **Questions** the audit could not answer from the code, the data or the machine.
 
-Give measurements with their date. Then record the audit, which quiets the session-start
-reminder for this project:
+Give measurements with their date. Then record the audit in the commit that carries its fixes:
+the report is the commit's body, and its last line is the trailer `doc-audit.sh mark` prints,
+which is what the session-start reminder looks for:
 
 ```
-bash ${CLAUDE_SKILL_DIR}/doc-audit.sh mark
+git commit --trailer "$(bash ${CLAUDE_SKILL_DIR}/doc-audit.sh mark)"
 ```
+
+An audit that found nothing to fix is still recorded, with `--allow-empty`. If the project
+squash-merges, the trailer has to survive into the squash commit's message, or main never sees
+the audit.
 
 ## Between audits
 
-The reminder at session start comes when the last recorded audit is more than 30 days old
-(`DOC_AUDIT_DAYS` changes that). Between audits, drift you notice while working is fixed if it is
-in a file you are already changing and mentioned otherwise, with an offer to run this audit.
+The reminder at session start comes when more than `DOC_AUDIT_CHANGED_LINES` lines (default
+500) of tracked files have changed since the last audit commit, working tree included, or when
+no audit commit is reachable. Code counts as well as documents: documents rot most when the code
+moves and they stand still. Untracked documents are outside git's view, so nothing triggers on
+them; they are checked whenever an audit runs for any other reason. In a shallow clone the audit
+commit may lie beyond the cut, and the reminder says it cannot tell.
+
+To set the threshold for a project, measure rather than guess: the churn of a quarter's ordinary
+work is `git diff --shortstat $(git rev-list -1 --before='3 months ago' HEAD)`. Between audits,
+drift you notice while working is fixed if it is in a file you are already changing and
+mentioned otherwise, with an offer to run this audit.
