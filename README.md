@@ -58,20 +58,25 @@ uvx copier==9.18.2 copy --trust gh:Thinmindt/conventions .
 uvx copier==9.18.2 update --defaults --trust
 ```
 
-The questions decide what is generated: the gate script and the CI workflow that runs it, the
-privacy check and a pre-push hook that refuses a push carrying a private term, `ruff.toml` with
-the guide's rules and the hardware boundary, an agent guide, and a one-line `docs/STYLE.md` that
-links to the guide instead of carrying a copy. The answers live in `.copier-answers.yml`. A
+The questions decide what is generated: the project's languages (Python, C#, C and C++, JavaScript,
+any mix) choose the gate's steps, and for Python the type checker (ty, pyright or mypy, added as a
+pinned dev dependency by a task) and the hardware boundary. Every project gets the gate script and
+the CI workflow that runs it, the privacy check and a pre-push hook that refuses a push carrying a
+private term, an agent guide, and a one-line `docs/STYLE.md` that links to the guide instead of
+carrying a copy; a Python project also gets `ruff.toml` with the guide's rules. The gate's steps
+for the other languages arrive with roadmap §17. The answers live in `.copier-answers.yml`. A
 generated file is never edited by hand: a project-specific need is an answer, or a change to the
 template. `scripts/private_terms.sh` is the project's own and survives every update. `--trust` is
-needed because the template's tasks install the hook and ignore `.private-terms`. Copier reads
-only `v<version>` tags, so a project updates to the newest release, and a session-start hook
-says when a project is behind the installed plugin.
+needed because the template's tasks install the hook and ignore `.private-terms`. Copier reads only
+`v<version>` tags, so a project updates to the newest release, and a session-start hook says when a
+project is behind the installed plugin.
 
 ## Updating
 
-A change to `skills/`, `hooks/` or `agents/` bumps `version` in `.claude-plugin/plugin.json`;
-the gate compares both with `origin/main` and refuses the change if the version stayed. Once the
+A change to `skills/`, `hooks/`, `agents/`, `template/` or `copier.yml` bumps `version` in
+`.claude-plugin/plugin.json`; the gate compares them with `origin/main` and refuses the change if
+the version stayed. The template needs the tag as much as the plugin does, since a project
+updates only to a tag. Once the
 change is on main, tag the release from a clean checkout of it, as `v<version>`, which is the
 form Copier reads (roadmap §7):
 

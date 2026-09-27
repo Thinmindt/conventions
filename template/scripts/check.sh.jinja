@@ -7,15 +7,22 @@ cd "$(dirname "$0")/.."
 files() { git ls-files -z --cached --others --exclude-standard "$@"; }
 
 bash scripts/check_private.sh
-{%- if python %}
+{%- if "python" in languages %}
 uvx ruff==0.15.8 check .
 uvx ruff==0.15.8 format --check .
+{%- if type_checker == "ty" %}
+uv run ty check .
+{%- elif type_checker == "pyright" %}
+uv run pyright
+{%- elif type_checker == "mypy" %}
+uv run mypy .
+{%- endif %}
 {%- endif %}
 if [ -n "$(files '*.sh' | tr -d '\0')" ]; then
     files '*.sh' | xargs -0 uvx --from shellcheck-py==0.11.0.1 shellcheck
 fi
 files | xargs -0 uvx codespell==2.4.3
-{%- if python %}
+{%- if "python" in languages %}
 if [ -d tests ]; then
     uv run pytest -q
 fi

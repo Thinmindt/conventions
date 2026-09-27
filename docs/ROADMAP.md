@@ -6,7 +6,8 @@ with the date they moved. Numbers never change. The reasoning behind most entrie
 [survey-2026-09.md](survey-2026-09.md).
 
 The numbers give the intended order. What leaves the skills (3, 4, 12) lands in the Copier
-template (7, in the archive). 5 comes before the new skills (6, 9, 10, 14), so each one can be
+template (7, in the archive), and 17 gives the template and the skills their shape across
+languages, so it comes before 3. 5 comes before the new skills (6, 9, 10, 14), so each one can be
 shown to earn its place. 15 and 16 come after what they hold out and measure (5, 6, 11).
 
 ## 3. Reduce each skill to what needs a reader
@@ -24,7 +25,8 @@ paragraph goes. Applied to the three skills:
 - [ ] Explanation for people, the reasoning and the worked examples, moves to a reference file
   beside each skill that the skill names and Claude reads on demand. `docs/STYLE.md` links to it.
 - [ ] Design documents and plans apply in every language, so they leave python-style for a skill
-  `docs-style`, moved verbatim; python-style keeps a one-line pointer.
+  `docs-style`, moved verbatim; python-style keeps a one-line pointer. The rest of what is
+  language-neutral in the two Python skills moves as §17 says.
 - [ ] Record each skill's context cost (§5) before and after, so the cut is measured.
 
 **Done means:** each skill body is rules with the failure each prevents; no body states what a
@@ -233,6 +235,45 @@ produces it already leaves a record in git, and nothing is kept by hand.
 **Done means:** `scripts/metrics.sh` on this repository prints the three numbers for the last
 quarter, and `scripts/test_scripts.sh` covers it on a throwaway repository with seeded trailers and
 a result file.
+
+## 17. Every language, one core
+
+The work is Python, C#, C, C++ and JavaScript, alone or mixed in one project. What is true in
+every language is carried once and reaches every project; what is true in one language reaches
+the projects that use it. Skills need no per-project installation: they are on every machine
+through the plugin and load by their descriptions, so a C# file never loads python-style. What is
+per project is the tooling the template generates and the agent guide's pointers, and those
+follow the `languages` answer.
+
+- [x] The template asks `languages` (multi-select) instead of a Python yes/no, and renders the
+  gate's steps per language. For Python, `type_checker` (ty, pyright or mypy, pinned) is added as a
+  dev dependency by a task, and the gate runs it inside the project's environment.
+- [ ] The skills split into a neutral core and language additions. python-style's naming, comment,
+  error and test rules are not Python's; python-traps' threads, callbacks, crash-safe files,
+  network filesystems, services and public-repository rules are not Python's either, only their
+  examples are. They become `style` and `traps`, with each language's examples in a reference file
+  the skill names (§3), and python-style and python-traps keep what is only Python: docstrings,
+  logging, ruff, uv with apt-only packages.
+- [ ] JavaScript and TypeScript: the gate runs the project's linter and formatter and, for
+  TypeScript, `tsc --noEmit`, through the project's package manager so the lockfile pins them.
+  Decide between eslint with prettier and biome by measuring on a real project, as the Tooling
+  rule says; `typescript` is a question only if a JavaScript project without it is likely.
+- [ ] C#: `dotnet format --verify-no-changes`, a build with warnings as errors and the analyzers
+  on, and `dotnet test`; the SDK pinned in `global.json`, which the template writes.
+- [ ] C and C++: `clang-format --dry-run --Werror` and `clang-tidy` through `uvx` at pinned
+  versions (both ship as wheels), a CMake build with warnings as errors, and `ctest`. clang-tidy
+  needs `compile_commands.json`, which the CMake step exports.
+- [ ] Each language gets its style and traps skills only as rules are paid for: `csharp-`, `c-cpp-`
+  and `javascript-` prefixes, in the form of the Python ones, each rule with the failure it
+  prevents. Their examples are checked by `check_examples.sh` the way Python's are, with each
+  language's compiler or formatter.
+- [ ] The generated `AGENTS.md` names the skills that apply to the project's languages, and §12's
+  "enforced by" lines name each language's linter.
+
+**Done means:** a project generated with two languages has a gate that runs both toolchains and
+passes on a fresh tree; a session touching a C# file loads no Python skill and does load `style`
+and `traps` (an eval case, §5); `scripts/test_scripts.sh` covers a mixed project and a single
+non-Python one.
 
 ## Open questions
 

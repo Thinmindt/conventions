@@ -173,5 +173,22 @@ plugin_version=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$root/.claude-plug
 sed -i "s/^_commit: .*/_commit: v$plugin_version/" "$gen/.copier-answers.yml"
 expect "template-version: project current, silent" "" "$(versions "$gen")"
 expect "template-version: no answers file, silent" "" "$(versions "$work/nodocs")"
+typed=$work/typed
+mkdir -p "$typed/src"
+git -C "$typed" init -q -b main
+git -C "$typed" config user.name Tester
+git -C "$typed" config user.email tester@example.org
+printf 'def add(a: int, b: int) -> int:\n    return a + b\n' >"$typed/src/demo.py"
+"${copier[@]}" copy -q --defaults --trust -d project_name=Typed -d type_checker=ty "$tpl" "$typed"
+expect "template: type checker pinned as a dev dependency" yes \
+    "$(grep -q '"ty==0.0.84"' "$typed/pyproject.toml" && echo yes)"
+expect "template: gate runs the type checker" yes "$(grep -q '^uv run ty check' "$typed/scripts/check.sh" && echo yes)"
+expect "template: typed project's gate passes" pass \
+    "$( (cd "$typed" && bash scripts/check.sh >/dev/null 2>&1) && echo pass || echo fail)"
+only_csharp=$work/csharp
+mkdir "$only_csharp"
+git -C "$only_csharp" init -q -b main
+"${copier[@]}" copy -q --defaults --trust -d project_name=Sharp -d 'languages=["csharp"]' "$tpl" "$only_csharp"
+expect "template: no Python, no ruff" yes "$([ ! -e "$only_csharp/ruff.toml" ] && ! grep -q ruff "$only_csharp/scripts/check.sh" && echo yes)"
 
 [ "$failures" -eq 0 ] || exit 1
