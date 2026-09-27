@@ -1,0 +1,4 @@
+#!/bin/bash
+# Prints this project's private terms, one per line, for scripts/check_private.sh: terms that
+# live elsewhere (an .env value, a config file) and must not be written down twice. The
+# project's own file: the conventions template never overwrites it.

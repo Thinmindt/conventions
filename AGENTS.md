@@ -21,8 +21,9 @@ scripts that check them. What each skill does, and how the plugin is installed: 
 - How the plugin compares with published practice, as of its date: `docs/survey-2026-09.md`.
 - The rules for design documents and plans in any project: the python-style skill, "Design
   documents" and "Plans". They apply to `docs/` here.
-- The privacy check every public project copies: `skills/doc-audit/check_private.sh`. The copy
-  in `scripts/` is this repository's own.
+- What a project is generated from: `copier.yml` and `template/`, described under "In a
+  project" in the README. `scripts/check_private.sh` here is this repository's own copy of the
+  template's, and the gate keeps the two identical.
 
 ## Habits
 

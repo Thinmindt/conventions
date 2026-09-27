@@ -15,8 +15,8 @@ Three skills, loaded when the work calls for them:
 - **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
   the code and the machine, current (plans are the plan as it stands, history archived), each
   fact in one place, nothing private, nothing tied to one installation or one person's settings.
-  It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
-  unchanged; a project adds its own terms with `scripts/private_terms.sh`.
+  The privacy check every project's gate runs first, `scripts/check_private.sh`, is generated
+  from the template below; a project adds its own terms with `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md`, an
 `AGENTS.md` or a `docs/` directory has changed by more than 2000 lines since its last audit, or
@@ -50,14 +50,23 @@ claude plugin install conventions@conventions
 
 ## In a project
 
-A project's `docs/STYLE.md` links to the guide instead of carrying a copy:
+A project is generated from the Copier template in this repository, `copier.yml` and
+`template/`, and updated from it:
 
 ```
-This project follows [the conventions style guide](https://github.com/Thinmindt/conventions/blob/main/skills/python-style/SKILL.md).
+uvx copier==9.18.2 copy --trust gh:Thinmindt/conventions .
+uvx copier==9.18.2 update --defaults --trust
 ```
 
-`scripts/check_private.sh` is the one file a project copies, unchanged, from
-`skills/doc-audit/`; its terms live outside the copy.
+The questions decide what is generated: the gate script and the CI workflow that runs it, the
+privacy check and a pre-push hook that refuses a push carrying a private term, `ruff.toml` with
+the guide's rules and the hardware boundary, an agent guide, and a one-line `docs/STYLE.md` that
+links to the guide instead of carrying a copy. The answers live in `.copier-answers.yml`. A
+generated file is never edited by hand: a project-specific need is an answer, or a change to the
+template. `scripts/private_terms.sh` is the project's own and survives every update. `--trust` is
+needed because the template's tasks install the hook and ignore `.private-terms`. Copier reads
+only `v<version>` tags, so a project updates to the newest release, and a session-start hook
+says when a project is behind the installed plugin.
 
 ## Updating
 

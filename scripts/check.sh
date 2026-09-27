@@ -8,8 +8,8 @@ codespell=(uvx codespell==2.4.3)
 files() { git ls-files -z --cached --others --exclude-standard "$@"; }
 
 bash scripts/check_private.sh
-if ! cmp -s skills/doc-audit/check_private.sh scripts/check_private.sh; then
-    echo "scripts/check_private.sh has drifted from the template in skills/doc-audit/" >&2
+if ! cmp -s template/scripts/check_private.sh scripts/check_private.sh; then
+    echo "scripts/check_private.sh has drifted from template/scripts/check_private.sh" >&2
     exit 1
 fi
 bash scripts/check_version.sh

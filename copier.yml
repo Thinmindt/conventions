@@ -1,0 +1,35 @@
+# The template every project is generated from, and updated from (README, "In a project").
+# The template's files are under template/; the plugin's are everything else.
+_min_copier_version: "9.18"
+_subdirectory: template
+_skip_if_exists:
+  - scripts/private_terms.sh
+_tasks:
+  - "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath scripts/githooks || true"
+  - "grep -qx '.private-terms' .gitignore 2>/dev/null || echo '.private-terms' >>.gitignore"
+
+project_name:
+  type: str
+  help: The project's name, as its README gives it
+
+python:
+  type: bool
+  help: Does the project contain Python? (ruff, and pytest when tests/ exists)
+  default: true
+
+hardware_module:
+  type: str
+  help: The one module that may import the device library, e.g. src/capture/camera.py (empty for none)
+  default: ""
+  when: "{{ python }}"
+
+device_library:
+  type: str
+  help: The device library that stays behind that boundary, e.g. picamera2
+  default: ""
+  when: "{{ python and hardware_module }}"
+
+private_terms:
+  type: bool
+  help: Does the project print private terms of its own from scripts/private_terms.sh?
+  default: false

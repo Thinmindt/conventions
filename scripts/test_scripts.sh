@@ -1,6 +1,6 @@
 #!/bin/bash
-# Exercises doc-audit.sh, the check_private.sh template, check_examples.sh and check_version.sh
-# in throwaway directories.
+# Exercises doc-audit.sh, check_private.sh, check_examples.sh, check_version.sh, the Copier
+# template and template-version.sh in throwaway directories.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
@@ -52,7 +52,7 @@ unset CLAUDE_PROJECT_DIR
 # check_private.sh: passes with no terms, fails on a term in a file or an unpushed commit.
 repo=$work/repo
 mkdir -p "$repo/scripts"
-cp "$root/skills/doc-audit/check_private.sh" "$repo/scripts/"
+cp "$root/template/scripts/check_private.sh" "$repo/scripts/"
 git -C "$repo" init -q
 git -C "$repo" config user.name Tester
 git -C "$repo" config user.email tester@example.org
@@ -125,5 +125,53 @@ echo "another rule" >>"$plugin/skills/one/SKILL.md"
 expect "check_version: skill changed, version not" fail "$(version_status)"
 echo '{"name": "p", "version": "1.1.0"}' >"$plugin/.claude-plugin/plugin.json"
 expect "check_version: skill changed, version bumped" pass "$(version_status)"
+
+# The Copier template: a fresh project's gate passes and its hook is installed and bites; an update
+# brings the template's change in and leaves the project's own file alone; template-version.sh
+# notices a project that is behind. The template is copied into a tagged repository first, since
+# Copier updates only from tags.
+copier=(uvx copier==9.18.2)
+tpl=$work/conventions-template
+mkdir -p "$tpl"
+cp -r "$root/copier.yml" "$root/template" "$tpl/"
+git -C "$tpl" init -q -b main
+git -C "$tpl" config user.name Tester
+git -C "$tpl" config user.email tester@example.org
+git -C "$tpl" add -A
+git -C "$tpl" commit -q -m "template"
+git -C "$tpl" tag v0.0.1
+gen=$work/gen
+mkdir "$gen"
+git -C "$gen" init -q -b main
+git -C "$gen" config user.name Tester
+git -C "$gen" config user.email tester@example.org
+"${copier[@]}" copy -q --defaults --trust -d project_name=Gen -d private_terms=true "$tpl" "$gen"
+gate() { (cd "$gen" && bash "$1" >/dev/null 2>&1) && echo pass || echo fail; }
+expect "template: generated gate passes" pass "$(gate scripts/check.sh)"
+expect "template: pre-push hook installed" scripts/githooks "$(git -C "$gen" config core.hooksPath)"
+expect "template: .private-terms ignored" yes "$(grep -qx '.private-terms' "$gen/.gitignore" && echo yes)"
+expect "template: answers record the tag" v0.0.1 "$(sed -n 's/^_commit: *//p' "$gen/.copier-answers.yml")"
+git -C "$gen" add -A
+git -C "$gen" commit -q -m "generated"
+printf '#!/bin/bash\necho quokka\n' >"$gen/scripts/private_terms.sh"
+echo "a quokka" >"$gen/notes.md"
+expect "template: pre-push hook refuses a private term" fail "$(gate scripts/githooks/pre-push)"
+rm "$gen/notes.md"
+git -C "$gen" commit -q -am "own private terms"
+echo "- A rule the template gained later." >>"$tpl/template/AGENTS.md.jinja"
+git -C "$tpl" commit -q -am "a rule"
+git -C "$tpl" tag v0.0.2
+(cd "$gen" && "${copier[@]}" update -q --defaults --trust)
+expect "template: update brings the template's change" yes \
+    "$(grep -q 'A rule the template gained later' "$gen/AGENTS.md" && echo yes)"
+expect "template: update leaves the project's private_terms.sh" quokka "$(bash "$gen/scripts/private_terms.sh")"
+expect "template: answers move to the new tag" v0.0.2 "$(sed -n 's/^_commit: *//p' "$gen/.copier-answers.yml")"
+versions() { CLAUDE_PROJECT_DIR=$1 CLAUDE_PLUGIN_ROOT=$root bash "$root/hooks/template-version.sh"; }
+expect "template-version: project behind the plugin" yes \
+    "$(versions "$gen" | grep -q 'generated from conventions v0.0.2' && echo yes)"
+plugin_version=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$root/.claude-plugin/plugin.json")
+sed -i "s/^_commit: .*/_commit: v$plugin_version/" "$gen/.copier-answers.yml"
+expect "template-version: project current, silent" "" "$(versions "$gen")"
+expect "template-version: no answers file, silent" "" "$(versions "$work/nodocs")"
 
 [ "$failures" -eq 0 ] || exit 1

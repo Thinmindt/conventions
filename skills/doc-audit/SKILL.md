@@ -84,9 +84,9 @@ network addresses, hostnames, share names, tokens, personal email addresses, and
 pets' names; anything private moves to a gitignored file. If it has already been pushed, report
 it; rewriting pushed history is the owner's decision.
 
-Every public project carries the check that enforces this, `scripts/check_private.sh`, copied
-unchanged from `check_private.sh` in this skill's directory and run first by the project's gate
-script. It fails when a term appears in a tracked or about-to-be-added file, or in the author,
+Every public project carries the check that enforces this, `scripts/check_private.sh`,
+generated unchanged from the conventions template (`template/scripts/check_private.sh`) and run
+first by the project's gate script. It fails when a term appears in a tracked or about-to-be-added file, or in the author,
 committer or message of a commit no remote has yet. Its terms come from two places:
 
 - `.private-terms`, gitignored, one per line: the addresses, hostnames and tokens of this
@@ -97,7 +97,8 @@ committer or message of a commit no remote has yet. Its terms come from two plac
 
 Without either, as on CI or in a fresh clone, the check passes and says nothing is configured.
 If the project's copy has drifted from the template, bring it back and move the difference into
-`private_terms.sh`. A project with no copy gets one as part of the audit.
+`private_terms.sh`. A project without it is generated from the template as part of the audit
+(README, "In a project").
 
 **General.** A stranger with different hardware and different settings should be able to follow
 every tracked document. Look for:

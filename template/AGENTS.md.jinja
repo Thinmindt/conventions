@@ -1,0 +1,18 @@
+# Agent guide
+
+{{ project_name or "This project" }} follows the conventions style guide, linked from
+`docs/STYLE.md`.
+
+- Before a change is done, `scripts/check.sh` passes. CI runs the same script.
+- `scripts/check.sh`, `scripts/check_private.sh`, `scripts/githooks/pre-push`,
+  {% if python %}`ruff.toml`, {% endif %}the workflow, `docs/STYLE.md` and this file are generated
+  from the conventions template. Never edit them by hand: a project-specific need is an answer in
+  `.copier-answers.yml` or a change to the template. `uvx copier==9.18.2 update --defaults --trust`
+  brings the newest template in.
+- Private terms (addresses, hostnames, names) go in `.private-terms`, which is gitignored{% if private_terms %},
+  or are printed by `scripts/private_terms.sh`, which is this project's own{% endif %}. The pre-push
+  hook refuses a push that carries one.
+{%- if hardware_module %}
+- `{{ device_library }}` is imported only in `{{ hardware_module }}`; the linter enforces the
+  boundary (python-style, "Hardware sits behind a boundary").
+{%- endif %}

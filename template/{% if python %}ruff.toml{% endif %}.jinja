@@ -1,0 +1,24 @@
+# Generated from the conventions template; the python-style guide names the rule behind each
+# entry. Change the template or .copier-answers.yml, not this file. A [tool.ruff] table in
+# pyproject.toml is ignored while this file exists.
+line-length = 100
+
+[lint]
+extend-select = [
+    "T20",    # print() in code that runs unattended
+    "G",      # logging with f-strings or eager formatting
+    "BLE",    # blind except
+    "PGH004", # noqa without a code
+    "S104",   # binding every interface
+{%- if hardware_module %}
+    "TID251", # the device library stays behind its boundary
+{%- endif %}
+]
+{%- if hardware_module %}
+
+[lint.flake8-tidy-imports.banned-api]
+"{{ device_library }}".msg = "only {{ hardware_module }} may import {{ device_library }}"
+
+[lint.per-file-ignores]
+"{{ hardware_module }}" = ["TID251"]
+{%- endif %}

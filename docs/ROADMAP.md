@@ -5,10 +5,9 @@ change that earns it. Finished items move verbatim to `ROADMAP-archive.md` under
 with the date they moved. Numbers never change. The reasoning behind most entries is in
 [survey-2026-09.md](survey-2026-09.md).
 
-The numbers give the intended order. 7 is the spine: it is where everything that leaves the
-skills (3, 4, 12) lands, so its first version comes before those. 5 comes before the new skills
-(6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after what they hold
-out and measure (5, 6, 11).
+The numbers give the intended order. What leaves the skills (3, 4, 12) lands in the Copier
+template (7, in the archive). 5 comes before the new skills (6, 9, 10, 14), so each one can be
+shown to earn its place. 15 and 16 come after what they hold out and measure (5, 6, 11).
 
 ## 3. Reduce each skill to what needs a reader
 
@@ -38,7 +37,7 @@ project with no Python, and the cost table in `evals/results/` shows the before 
 Skills are guides. The only sensor is the gate, and it runs when someone runs it. Start with the
 rule whose failure is costliest to undo.
 
-- [ ] A git pre-push hook that runs `scripts/check_private.sh`, written into the project by the
+- [x] A git pre-push hook that runs `scripts/check_private.sh`, written into the project by the
   template and installed by its task (§7). The repository is the right place for a push gate: it
   holds for every tool and every person, not only a Claude session.
 - [ ] `check_private.sh` reads the working tree and the messages of unpushed commits, not their
@@ -99,50 +98,6 @@ Claude Code team write the lesson back as part of the work.
 
 **Done means:** after a correction in a project session, invoking the skill leaves a branch here
 that has the new entry in the chosen file and passes `scripts/check.sh`.
-
-## 7. Set up a project from a Copier template, and keep it updated
-
-Everything a project takes from this repository, the gate, the linter rules, the privacy check,
-the CI workflow, the pre-push hook and the agent guide, is generated from one Copier template
-that lives here beside the plugin, and re-generated when the template moves. Per-project
-configuration is expected to grow, and Copier's answers file is where it grows: a question in
-`copier.yml`, an answer in the project, never an edit to a generated file. This is the spine the
-rest of the roadmap hangs on: what leaves the skills (§3, §4, §12) lands here.
-
-Facts from a scratch run of Copier 9.18 that shape the design: it reads only PEP 440 tags, so
-releases are tagged `v<version>` and `claude plugin tag`'s format is invisible to it; `copier
-update` looks for `.copier-answers.yml` by that name unless told otherwise, so the default name
-stays; a three-line generated file conflicted on update when the project had edited one line and
-the template another, so generated files are never hand-edited.
-
-- [ ] `copier.yml` at the root with `_subdirectory: template`, so the plugin's files and the
-  template's do not mix. `_min_copier_version` pinned. Questions to start: `project_name`,
-  `python` (yes/no), `hardware_module` (the one module that may import the device library, empty
-  for none), `private_terms` (whether the project prints its own terms). Each later question
-  arrives with the template change that needs it.
-- [ ] `template/` renders: `scripts/check.sh` (the gate, sized to the answers), `scripts/
-  check_private.sh` (moved here from the doc-audit skill, which points at it; this repository's
-  `scripts/` copy is compared with the template's), `ruff.toml` carrying the guide's rules and the
-  hardware boundary from the answer (§12), `.github/workflows/check.yml`, `scripts/githooks/
-  pre-push` (§4), a short `AGENTS.md` pointing at `docs/STYLE.md` and the gate, the one-line
-  `docs/STYLE.md`, and `.copier-answers.yml`. `scripts/private_terms.sh` is under
-  `_skip_if_exists`, so a project's own version survives every update.
-- [ ] A task (`_tasks`, so `--trust`) sets `core.hooksPath` to `scripts/githooks`, which installs
-  the pre-push hook without touching `.git/hooks` by hand.
-- [ ] The rule, stated in the project's generated `AGENTS.md` and in the README here: a generated
-  file is never edited by hand; a project-specific need becomes an answer or a template change.
-- [ ] Commands, in the README here: `uvx copier copy gh:Thinmindt/conventions .` to set up, `uvx
-  copier update --defaults` to bring a project to the newest tag, both pinned to a Copier version.
-- [ ] The session-start hook compares `_commit` in a project's `.copier-answers.yml` with the
-  plugin's version and says when the project is behind, the way the doc audit reminder works.
-- [ ] `scripts/test_scripts.sh` copies the template into a throwaway repository with default
-  answers and runs the generated gate; then edits the template, tags, updates, and shows the
-  project's `private_terms.sh` untouched and the generated files moved.
-
-**Done means:** a fresh project made with one `copier copy` has a passing gate, a working pre-push
-hook and an agent guide, with no hand edits; after a template change and a tag, `copier update` in
-that project brings the change in and touches nothing the project owns; the session-start hook
-names a project that is behind. All three are covered by `scripts/test_scripts.sh`.
 
 ## 9. How a change is carried out
 

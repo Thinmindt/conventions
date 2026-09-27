@@ -1,0 +1,5 @@
+#!/bin/bash
+# Refuses a push that carries a private term, by running the project's privacy check. Installed
+# through core.hooksPath by the conventions template's task; generated, so not edited by hand.
+cd "$(dirname "$0")/../.."
+exec bash scripts/check_private.sh
