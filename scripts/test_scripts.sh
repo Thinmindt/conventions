@@ -1,5 +1,6 @@
 #!/bin/bash
-# Exercises doc-audit.sh and the check_private.sh template in throwaway directories.
+# Exercises doc-audit.sh, the check_private.sh template and check_examples.sh in throwaway
+# directories.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
@@ -54,5 +55,34 @@ expect "check_private: term from private_terms.sh" fail "$(status)"
 rm "$repo/draft.md"
 git -C "$repo" -c user.email=me@zanzibar.example commit -q --allow-empty -m "second"
 expect "check_private: term in an unpushed commit's author" fail "$(status)"
+
+# check_examples.sh: a fragment that follows the guide passes; one that breaks it, or does not
+# parse, fails at the skill's own line.
+skill=$work/skill/SKILL.md
+mkdir -p "$(dirname "$skill")"
+examples() { bash "$root/scripts/check_examples.sh" "$skill" 2>/dev/null || echo "fail"; }
+cat >"$skill" <<'MD'
+```python
+log.info("ok %s", x)
+return None
+```
+MD
+expect "check_examples: fragment following the guide" \
+    "skill examples: parse and pass ruff" "$(examples)"
+cat >"$skill" <<'MD'
+text
+```python
+print("x")
+```
+MD
+expect "check_examples: print in an example" yes \
+    "$(examples | grep 'SKILL.md:3:1: T201' >/dev/null && echo yes)"
+cat >"$skill" <<'MD'
+```python
+return 1 +
+```
+MD
+expect "check_examples: example that does not parse" yes \
+    "$(examples | grep 'SKILL.md:2: invalid syntax' >/dev/null && echo yes)"
 
 [ "$failures" -eq 0 ] || exit 1

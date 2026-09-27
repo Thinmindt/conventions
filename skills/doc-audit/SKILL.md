@@ -116,8 +116,8 @@ every tracked document. Look for:
   sizes) in code or docs that are not that implementation's.
 
 **Consistent with the conventions.** Comments and docstrings follow python-style; design entries
-give what, why and when; a project's `docs/STYLE.md` still matches the python-style skill below
-its front matter: `diff <(tail -n +6 <plugin>/skills/python-style/SKILL.md) docs/STYLE.md`.
+give what, why and when; a project's `docs/STYLE.md` links to the python-style guide rather than
+carrying a copy of it, which would drift.
 
 ## How to run it
 
