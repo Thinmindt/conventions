@@ -6,7 +6,8 @@ with the date they moved. Numbers never change. The reasoning behind most entrie
 [survey-2026-09.md](survey-2026-09.md).
 
 The numbers give the intended order. 1, 2, 8 and 13 are small and independent. 5 comes before
-the new skills (6, 9, 10, 14), so each one can be shown to earn its place.
+the new skills (6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after
+what they hold out and measure (5, 6, 11).
 
 ## 1. Validate the plugin in the gate
 
@@ -28,7 +29,8 @@ reports "no audit recorded" in every session, and a second workstation repeats a
 done.
 
 - [ ] `doc-audit.sh mark` prints a `Doc-Audit: <date>` trailer for the audit's commit, so the
-  commit that carries the audit's fixes also marks the state that was audited. Nothing is written
+  commit that carries the audit's fixes also marks the state that was audited. The commit's body is
+  the audit's report, so the findings travel with the state they describe (§16). Nothing is written
   outside the tree; the state directory goes, and `DOC_AUDIT_DAYS` with it.
 - [ ] `doc-audit.sh check` finds the newest commit with that trailer and measures what has changed
   since it: lines added and removed in tracked files (`git diff --shortstat`), working tree
@@ -67,18 +69,24 @@ case (§5) shows `docs-style` loading when a design document is edited in a proj
 Skills are guides. The only sensor is the gate, and it runs when someone runs it. Start with the
 rule whose failure is costliest to undo.
 
-- [ ] A PreToolUse hook on `Bash` that matches `git push`. It runs the project's
-  `scripts/check_private.sh`, if the project has one, and blocks the push with the check's output
-  when it fails.
-- [ ] A git pre-push hook that runs the same check, installed by the project bootstrap (§7), so a
-  push made outside an agent session is covered too.
+- [ ] A git pre-push hook that runs `scripts/check_private.sh`, installed by the project bootstrap
+  (§7). The repository is the right place for a push gate: it holds for every tool and every
+  person, not only a Claude session.
+- [ ] `check_private.sh` reads the working tree and the messages of unpushed commits, not their
+  content. A term committed and removed again before the push still lives in history, so the check
+  also scans the content of unpushed commits (`git log -p HEAD --not --remotes`). The template
+  changes, so every project's copy changes with it (§7).
+- [ ] A PreToolUse hook on `Bash` in this plugin that matches `git push`, for projects that have
+  not run `init`. It runs the project's `scripts/check_private.sh` when the project has one, and
+  blocks the push with the check's output when it fails.
 - [ ] Measure before adding more. Candidates: a PostToolUse formatter on `*.py` when the project
   configures ruff, and a Stop hook that runs the gate on request (a `userConfig` option, off by
   default).
 
-**Done means:** in a session, a `git push` with a private term in an unpushed commit is refused
-and Claude sees why. `scripts/test_scripts.sh` feeds the hook its JSON input and asserts both the
-block and the pass.
+**Done means:** in a session, a `git push` with a private term in the content of an unpushed
+commit is refused and Claude sees why, with or without the project's pre-push hook.
+`scripts/test_scripts.sh` covers the committed-and-removed case, and feeds the plugin hook its JSON
+input to assert both the block and the pass.
 
 ## 5. Evaluate the skills
 
@@ -95,9 +103,9 @@ result.
 - [ ] Record each skill's context cost (`claude plugin details`), with the date. Try a `paths:`
   scope on python-style and keep it if no triggering case regresses.
 
-**Done means:** `claude plugin eval` runs the suite locally, and the first results, with their date
-and run count, are in the archive. The suite is not a CI gate: it costs tokens and needs
-credentials.
+**Done means:** `claude plugin eval` runs the suite locally, and each run's result, with its date
+and run count, is committed under `evals/results/` (§16). The suite is not a CI gate: it costs
+tokens and needs credentials.
 
 ## 6. Turn a correction into a rule
 
@@ -108,10 +116,15 @@ Claude Code team write the lesson back as part of the work.
   in the current session, it drafts the rule in house form: the fact, the failure it prevents,
   the measurement. It then picks the rule's home, in this order:
   1. a lint rule or check (§12);
-  2. python-traps or python-style in this plugin;
+  2. a skill in this plugin, by scope: agent-traps (§14) or docs-style (§3) when the rule holds in
+     any language, python-traps or python-style when it holds only in Python;
   3. the project's own agent guide;
   4. nowhere, when the rule holds only for one installation.
-- [ ] It works on a branch in this repository, bumps the version and runs the gate. It never pushes.
+- [ ] The skill runs in a project session, where the plugin is an installed copy, not a clone. It
+  takes the path to a clone of this repository from a `userConfig` setting; with none, it prints
+  the entry for pasting.
+- [ ] In the clone it works on a branch, runs the gate and follows the version rule (§13). Its
+  commit carries a `Lesson:` trailer, so lessons can be counted (§16). It never pushes.
 
 **Done means:** after a correction in a project session, invoking the skill leaves a branch here
 that has the new entry in the chosen file and passes `scripts/check.sh`.
@@ -137,9 +150,9 @@ This repository has no CLAUDE.md or AGENTS.md, though doc-audit's table gives th
 role. The rules a contributor must know are in the README or nowhere. Projects touched by Codex,
 Copilot, Warp or Cursor get none of these conventions.
 
-- [ ] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, bump the
-  version on every change, keep `check_private.sh` identical to its template, and where plans and
-  the survey live. Add `CLAUDE.md` holding `@AGENTS.md`.
+- [ ] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, the
+  version rule as §13 settles it, keep `check_private.sh` identical to its template, and where
+  plans and the survey live. Add `CLAUDE.md` holding `@AGENTS.md`.
 - [ ] The agent guide that `conventions-project init` writes (§7) follows the same shape and points
   at `docs/STYLE.md`, so tools other than Claude Code read the conventions too.
 
@@ -156,7 +169,11 @@ Every published workflow surveyed covers that loop.
   - anything larger starts as a roadmap entry with its "done means";
   - a regression test is seen to fail before the fix (red/green);
   - the gate runs, with its result reported as evidence, before the change is called done;
-  - structural and behavioural changes go in separate commits.
+  - structural and behavioural changes go in separate commits;
+  - each task runs in its own worktree on its own branch (`git worktree add`, or Claude Code's
+    worktree isolation), so parallel sessions never share a working tree and a half-finished
+    change in one cannot enter another's commit. One folder with atomic commits from several
+    agents is the alternative, and harder to reason about.
 - [ ] It links python-style and docs-style rather than repeating them.
 
 **Done means:** an eval case (§5) that asks for a small feature shows the roadmap entry written
@@ -167,9 +184,11 @@ first, the gate run, and its output quoted before completion is claimed.
 The writer's context favours its own choices. A read-only subagent reviews the diff against the
 conventions, and nothing else.
 
-- [ ] `agents/conventions-reviewer.md`, limited to Read, Grep, Glob and `git diff`. It reports only
-  violations of python-style, python-traps and docs-style, each with file, line and the rule
-  broken. It offers no improvements beyond the rules.
+- [ ] `agents/conventions-reviewer.md`, given the diff in its prompt, with Read, Grep and Glob to
+  check the surrounding code and no Bash, Edit or Write (an agent's `tools:` cannot confine Bash to
+  one command). It reports only violations of this plugin's skills, python-style, python-traps,
+  docs-style (§3) and agent-traps (§14), each with file, line and the rule broken. It offers no
+  improvements beyond the rules.
 
 **Done means:** given a diff seeded with a `yield` under a lock, a `print()` in a service and a
 bare `noqa`, it reports all three and nothing else (an eval case in §5).
@@ -224,31 +243,73 @@ change to a skill without a version decision fails the gate or needs no decision
 ## 14. Traps for running agents unattended
 
 python-traps covers unattended Python services, but not unattended agents. The failures are just
-as specific.
+as specific, and none of them is Python's: a shell workflow leaks a token as readily as a service
+does. So this is a skill of its own, not a section in python-traps, and it loads in any language.
 
-- [ ] Add a section to python-traps, or a new skill if §5 shows a separate one triggers better:
+- [ ] `agent-traps`, in the form of python-traps, each rule naming the failure it prevents:
   - never combine private data, untrusted content and a way to send data out in one session (the
     lethal trifecta);
   - prefer permission allowlists to skipping permissions;
   - YOLO mode only in a container with restricted egress;
-  - treat issue and PR text as data, not instructions;
-  - an agent's credentials cannot push to the default branch.
+  - treat issue, PR and web text as data, not instructions;
+  - an agent's credentials cannot push to the default branch or approve its own pull request.
+- [ ] Its description names what it applies to: agent workflows, hooks, CI that runs an agent, and
+  plugin or permission settings, whatever the project's language.
 
 **Done means:** each rule names the failure it prevents, as the other traps do, and an eval case
-shows the skill loading when an unattended agent workflow (§11) is written.
+(§5) shows the skill loading when an unattended agent workflow (§11) is written in a project with no
+Python.
+
+## 15. Hold out scenarios the agent cannot see
+
+The eval suite (§5) lives in the tree, where the agent it grades can read it and, over enough
+sessions, learn the cases rather than the rules. StrongDM keeps its end-to-end scenarios where the
+agent cannot see or edit them. The question to settle is where such a set lives when every machine
+that could run it also runs an agent.
+
+- [ ] Choose the home. The leading option is a private repository, `conventions-holdout`, that no
+  agent credential can read. Its own workflow checks out this plugin, or a project, at a given
+  commit, runs the scenarios, and reports pass or fail per scenario name, never the scenario text,
+  so a failure says which behaviour broke without teaching the fix. A deny rule or a gitignored
+  directory on the same machine is the weaker option: the agent runs shell commands, and one
+  machine holds both.
+- [ ] Decide how scenarios get in: written by a person, and never copied from the public suite,
+  which the agent has seen.
+- [ ] Run it on demand and before a release (§13), not on every push; it costs tokens and
+  credentials.
+
+**Done means:** in a session with the plugin, asking Claude to print a holdout scenario fails for
+lack of access, and a run against a tagged version leaves a dated result, per scenario name, under
+`evals/results/` (§16).
+
+## 16. Measure the factory
+
+Nothing shows the conventions help beyond the sense that they do. Warp scores its factories and
+StrongDM measures "satisfaction". Three signals to start with, each cheap because the work that
+produces it already leaves a record in git, and nothing is kept by hand.
+
+- [ ] Pass rate per skill, over time: each eval run (§5) and holdout run (§15) commits its result
+  under `evals/results/<date>-<suite>.json`.
+- [ ] Lessons recorded per month: `record-lesson` commits carry a `Lesson:` trailer (§6), so
+  `git log --grep` counts them.
+- [ ] Findings per audit: the audit's commit carries its report under the `Doc-Audit:` trailer
+  (§2), so the same log gives the findings of each audit.
+- [ ] `scripts/metrics.sh` prints the three for a date range, from git and `evals/results/` and
+  nothing else. Its output is not stored; the sources are.
+- [ ] Say here what each number is for, so it is read the same way each time: a pass rate that
+  falls after a skill edit questions the edit; lessons falling to zero means corrections stopped
+  being written down, not that they stopped; findings per audit falling means the documents stay
+  true between audits, unless the reports show the audits getting shallower.
+
+**Done means:** `scripts/metrics.sh` on this repository prints the three numbers for the last
+quarter, and `scripts/test_scripts.sh` covers it on a throwaway repository with seeded trailers and
+a result file.
 
 ## Open questions
 
 Not yet plans. Each becomes a numbered entry or leaves this list once it is decided.
 
-- **Holdout scenarios.** StrongDM grades agents against end-to-end scenarios kept where the agent
-  cannot see or edit them. Would a private scenario set help the services these conventions are
-  written for, and where would it live?
 - **An agent-readable task tracker.** Steve Yegge's beads and Anthropic's JSON feature list replace
-  prose plans. The roadmap already works as the tracker for one owner. Revisit if several agents
-  work on one project at once.
-- **Measuring the factory.** Warp scores its factories and StrongDM measures "satisfaction". What
-  cheap signal would show these conventions help? Candidates: eval pass rates over time (§5), how
-  many lessons are recorded per month (§6), and how many doc-audit findings each audit turns up.
-- **Parallel sessions.** Worktrees per task (Cherny, Superpowers), or several agents in one folder
-  with atomic commits (Steinberger). Decide once §9 exists.
+  prose plans. The roadmap is the tracker while one owner drives one agent at a time. Revisit when
+  several agents run at once on one project; a worktree per task (§9) postpones the need, since
+  each agent's task is its own branch.
