@@ -1,6 +1,6 @@
 ---
 name: python-traps
-description: Rules for Python that runs unattended — threads and locks, callbacks on someone else's thread, files that must survive a crash, network filesystems, services under systemd and processes that exit themselves, secrets in logs, uv with apt-only packages, and what may go in a public repository. Each rule names the failure it prevents. Use when writing or reviewing threaded code, a callback or consumer, a file write that a reader may see early, a long-running service or its unit file, a watchdog or other self-exit, a secret URL that could reach a log, a venv that depends on system packages, or anything about to be pushed to a public repository.
+description: Rules for Python that runs unattended — threads and locks, callbacks on someone else's thread, files that must survive a crash, network filesystems, services under systemd and processes that exit themselves, secrets in logs, uv with apt-only packages, and what may go in a public repository. Each rule names the failure it prevents. Use when writing or reviewing threaded code, a callback or consumer, a file write that a reader may see early, a long-running service or its unit file, a watchdog, heartbeat or other self-exit, a secret URL that could reach a log, a venv that depends on system packages, or anything about to be pushed to a public repository.
 ---
 
 # Python traps
@@ -108,7 +108,10 @@ contain it.
 
 **Degrade at startup rather than die.** If one component cannot be constructed — a database that
 will not open, a device that is busy — bring up the rest with a warning. The web page that
-still comes up is often how you find out something is wrong.
+still comes up is often how you find out something is wrong. A heartbeat or health check must
+then report the degraded mode as unhealthy: one that keeps signalling because the process is up,
+while the part that does the work never started, tells the watcher all is well. List the
+degraded modes and decide what the signal says in each.
 
 **`print()` is block-buffered under a service manager.** Lines are lost when the process is
 killed. Use `logging`; set the root at `WARNING` and raise only your own loggers to `INFO`, or

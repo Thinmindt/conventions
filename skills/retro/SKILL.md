@@ -29,6 +29,13 @@ The sources are the conversation, `git log` and `git diff` of every branch touch
 reports, gate and test output, and the agent's memory. Each item names its instance: a file, a
 commit, a finding, a message. No instance, no lesson.
 
+Run in a fresh session, as after a restart, there is no conversation to read. The session under
+review is a transcript under `~/.claude/projects/`, in the directory named for the project's path
+with each `/` as `-`, one `.jsonl` file per session: the most recently modified one that is not
+the running session's own. The owner's messages and the agent's reports in it are the record.
+If that session already drew lessons, list which were applied and where, and propose only what
+is still open.
+
 ## Find why it got through
 
 For each shortfall, ask what should have stopped it:
