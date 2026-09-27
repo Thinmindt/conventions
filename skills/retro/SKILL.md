@@ -20,8 +20,7 @@ List what happened before judging any of it, from the record rather than from im
   code review finding that survived verification belongs here.
 - **Escapes.** Bugs found by a review, by hand or on the device after the gates had passed. These
   matter more than the failures a gate caught, because nothing yet stops them recurring.
-- **Time sinks.** Tool friction, blocked commands, waits, and structure that made work depend on
-  other unmerged work.
+- **Time sinks.** Tool friction, blocked commands and waits.
 - **What worked.** A measurement that settled a choice, a check that caught a bug, an order of
   work that paid off. These are kept on purpose, or they drift away too.
 
@@ -58,7 +57,6 @@ Patterns that recur, to test each shortfall against:
 - a proxy measured instead of the goal (a process that is up, when the goal is its work getting
   done)
 - work called done before it was reviewed
-- work stacked on other work that is not yet merged
 
 ## Put each lesson where it will be used
 
