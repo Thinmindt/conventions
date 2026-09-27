@@ -7,8 +7,9 @@ with the date they moved. Numbers never change. The reasoning behind most entrie
 
 The numbers give the intended order. What leaves the skills (3, 4, 12) lands in the Copier
 template (7, in the archive), and 17 gives the template and the skills their shape across
-languages, so it comes before 3. 5 comes before the new skills (6, 9, 10, 14), so each one can be
-shown to earn its place. 15 and 16 come after what they hold out and measure (5, 6, 11).
+languages, so it comes before 3; the gates for the other languages are 18, 19 and 20, one each,
+in whatever order a project needs them. 5 comes before the new skills (6, 9, 10, 14), so each one
+can be shown to earn its place. 15 and 16 come after what they hold out and measure (5, 6, 11).
 
 ## 3. Reduce each skill to what needs a reader
 
@@ -254,15 +255,10 @@ follow the `languages` answer.
   examples are. They become `style` and `traps`, with each language's examples in a reference file
   the skill names (§3), and python-style and python-traps keep what is only Python: docstrings,
   logging, ruff, uv with apt-only packages.
-- [ ] JavaScript and TypeScript: the gate runs the project's linter and formatter and, for
-  TypeScript, `tsc --noEmit`, through the project's package manager so the lockfile pins them.
-  Decide between eslint with prettier and biome by measuring on a real project, as the Tooling
-  rule says; `typescript` is a question only if a JavaScript project without it is likely.
-- [ ] C#: `dotnet format --verify-no-changes`, a build with warnings as errors and the analyzers
-  on, and `dotnet test`; the SDK pinned in `global.json`, which the template writes.
-- [ ] C and C++: `clang-format --dry-run --Werror` and `clang-tidy` through `uvx` at pinned
-  versions (both ship as wheels), a CMake build with warnings as errors, and `ctest`. clang-tidy
-  needs `compile_commands.json`, which the CMake step exports.
+- [ ] The gate's steps for each other language are their own entries: JavaScript and TypeScript
+  (§18), C# (§19), C and C++ (§20). Each follows the Python shape: tools pinned, run the same way
+  locally and in CI, rendered only when the language is answered, and a test that generates a
+  project in that language alone and runs its gate.
 - [ ] Each language gets its style and traps skills only as rules are paid for: `csharp-`, `c-cpp-`
   and `javascript-` prefixes, in the form of the Python ones, each rule with the failure it
   prevents. Their examples are checked by `check_examples.sh` the way Python's are, with each
@@ -270,10 +266,64 @@ follow the `languages` answer.
 - [ ] The generated `AGENTS.md` names the skills that apply to the project's languages, and §12's
   "enforced by" lines name each language's linter.
 
-**Done means:** a project generated with two languages has a gate that runs both toolchains and
-passes on a fresh tree; a session touching a C# file loads no Python skill and does load `style`
-and `traps` (an eval case, §5); `scripts/test_scripts.sh` covers a mixed project and a single
-non-Python one.
+**Done means:** a session touching a C# file loads no Python skill and does load `style` and
+`traps` (an eval case, §5); once §18, §19 and §20 exist, a project generated with two languages has
+a gate that runs both toolchains and passes on a fresh tree, covered by `scripts/test_scripts.sh`.
+
+## 18. The JavaScript and TypeScript gate
+
+Tools in this ecosystem are pinned by the project's lockfile, not by `uvx`, so the gate runs them
+through the project's package manager.
+
+- [ ] Decide between eslint with prettier and biome by measuring on a real project, as the
+  Tooling rule says: turn each on, look at what it flags, keep the one whose findings are worth
+  the time. Record the measurement in the archive with the decision.
+- [ ] The gate runs the linter and the formatter check, and `tsc --noEmit` when the project is
+  TypeScript. `typescript` becomes a question only if a JavaScript project without it is likely;
+  until then TypeScript is assumed.
+- [ ] A task installs the chosen tools as dev dependencies at pinned versions, and writes their
+  configuration files; the configuration carries the guide's rules as §12 names them for this
+  language. `package.json` is the project's own, so the task adds to it and the template never
+  renders it.
+- [ ] Tests run through the project's `test` script when one exists.
+- [ ] `scripts/test_scripts.sh` generates a JavaScript-only project and runs its gate. CI has
+  Node; the test skips with a message on a machine without it.
+
+**Done means:** a TypeScript project generated with one command has a passing gate that lints,
+checks formatting and types, and refuses a `console.log` where the guide's rule for it says so.
+
+## 19. The C# gate
+
+- [ ] `dotnet format --verify-no-changes`, then a build with warnings as errors and the analyzers
+  on (`TreatWarningsAsErrors`, `EnforceCodeStyleInBuild`, `AnalysisLevel` latest), then
+  `dotnet test`. The build settings live in a `Directory.Build.props` the template renders, so
+  every project in the solution inherits them without an edit to a `.csproj`.
+- [ ] `global.json` pins the SDK; the template writes it with the version as an answer, since the
+  SDK is installed per machine and no `uvx` equivalent exists.
+- [ ] `.editorconfig` carries the guide's rules as §12 names them for this language. If the
+  project has its own, the template's settings go in a section the task appends once.
+- [ ] `scripts/test_scripts.sh` generates a C#-only project and runs its gate. The gate and the
+  test skip with a message on a machine without the pinned SDK; CI installs it with the
+  `actions/setup-dotnet` action, pinned by SHA, in a step the template's workflow renders only for
+  C# projects.
+
+**Done means:** a C# project generated with one command has a passing gate on a fresh tree, and a
+warning introduced into a source file fails it.
+
+## 20. The C and C++ gate
+
+- [ ] `clang-format --dry-run --Werror` and `clang-tidy` through `uvx` at pinned versions: both
+  ship as wheels, so they pin the way ruff does and need no root. The template renders
+  `.clang-format` and `.clang-tidy` with the guide's rules as §12 names them for this language.
+- [ ] A CMake configure and build with warnings as errors, exporting `compile_commands.json`, which
+  clang-tidy reads; then `ctest`. The compiler is the machine's, so the gate prints its version
+  and the guide says which versions the project builds with.
+- [ ] `scripts/test_scripts.sh` generates a C++-only project with one source file and a test, and
+  runs its gate. CI's runner has a compiler and CMake; the test skips with a message on a machine
+  without them.
+
+**Done means:** a C++ project generated with one command has a passing gate on a fresh tree, and an
+unformatted line or a clang-tidy finding fails it.
 
 ## Open questions
 
