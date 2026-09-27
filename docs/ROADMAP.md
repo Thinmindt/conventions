@@ -19,20 +19,35 @@ today, but nothing runs it.
 
 **Done means:** a SKILL.md with broken front matter fails `scripts/check.sh` locally and in CI.
 
-## 2. Record doc audits where every machine can see them
+## 2. Trigger the audit by change, not by time
 
-The last-audit stamp lives under `~/.local/state`. So an ephemeral machine, such as a cloud
-session container, reports "no audit recorded" in every session, and a second workstation repeats
-an audit already done.
+Thirty days stands in for how much has changed, and stands in badly: a project untouched for a
+year has nothing new to audit, and one that changed heavily last week does. The stamp under
+`~/.local/state` is also per machine, so an ephemeral machine, such as a cloud session container,
+reports "no audit recorded" in every session, and a second workstation repeats an audit already
+done.
 
-- [ ] `doc-audit.sh mark` prints a `Doc-Audit: <date>` trailer for the audit's commit.
-  `doc-audit.sh check` takes the newest such trailer from `git log` and falls back to the local
-  stamp only for a project with no audit commit. Nothing new is added to the tree.
-- [ ] Update the doc-audit skill's "Report" section and the README to match.
+- [ ] `doc-audit.sh mark` prints a `Doc-Audit: <date>` trailer for the audit's commit, so the
+  commit that carries the audit's fixes also marks the state that was audited. Nothing is written
+  outside the tree; the state directory goes, and `DOC_AUDIT_DAYS` with it.
+- [ ] `doc-audit.sh check` finds the newest commit with that trailer and measures what has changed
+  since it: lines added and removed in tracked files (`git diff --shortstat`), working tree
+  included. It reminds when the total passes `DOC_AUDIT_CHANGED_LINES`, or when no audit commit
+  exists, and the message gives the audit's date, the lines changed and the threshold. The default
+  threshold is a measurement, not a guess: take the lines a few months of ordinary work changed in
+  a real project, and record the number and its date in the archive.
+- [ ] Code counts as well as documents, because documents rot most when the code moves and they
+  stand still. Untracked documents (`CLAUDE.local.md`, notes) are outside git's view, so nothing
+  triggers on them; the skill says they are checked whenever an audit runs for any other reason.
+- [ ] In a shallow clone the audit commit may lie beyond the cut. When no trailer is reachable and
+  `git rev-parse --is-shallow-repository` says true, `check` says it cannot tell, rather than
+  reminding.
+- [ ] Update the skill's "Report" and "Between audits" sections, the README and
+  `scripts/test_scripts.sh`.
 
-**Done means:** in a fresh clone on a machine with an empty state directory, `check` is silent
-when the last audit commit is under 30 days old. `scripts/test_scripts.sh` covers both the trailer
-and the fallback.
+**Done means:** in a fresh clone on any machine, `check` is silent right after an audit commit and
+reminds once enough has changed since it. `scripts/test_scripts.sh` covers no audit, a fresh
+audit, churn past the threshold, and a shallow clone.
 
 ## 3. Move the documentation rules out of python-style
 
@@ -159,18 +174,21 @@ conventions, and nothing else.
 **Done means:** given a diff seeded with a `yield` under a lock, a `print()` in a service and a
 bare `noqa`, it reports all three and nothing else (an eval case in §5).
 
-## 11. Run the doc audit on a schedule
+## 11. Run the audit unattended when it is due
 
-A reminder waits for someone to accept it. OpenAI runs its doc-gardening agent on a schedule.
+A reminder waits for someone to accept it. OpenAI runs its doc-gardening agent on a schedule; here
+the trigger is change (§2), so the same measurement can start the audit without a session.
 Depends on §2.
 
-- [ ] A scheduled GitHub Actions workflow, or a Claude Code routine, runs the doc-audit skill
-  headless on a chosen project. It commits to a branch and opens a pull request with the report.
-  It never merges, and it never touches untracked documents.
+- [ ] A GitHub Actions workflow on push to the default branch runs `doc-audit.sh check`. When the
+  audit is due, it runs the doc-audit skill headless, commits to a branch with the §2 trailer and
+  opens a pull request with the report. It never merges, and it never touches untracked
+  documents.
 - [ ] State which projects opt in, and how, in the doc-audit skill.
 
-**Done means:** one scheduled run on a real project opened a pull request whose report follows the
-skill's "Fixed / Needs the owner / Questions" form, and the audit commit carries the §2 trailer.
+**Done means:** on a real project, the push that crossed the threshold opened a pull request whose
+report follows the skill's "Fixed / Needs the owner / Questions" form, and the first push after
+that pull request merged opened nothing.
 
 ## 12. Name the linter behind each rule
 
@@ -217,7 +235,7 @@ as specific.
   - an agent's credentials cannot push to the default branch.
 
 **Done means:** each rule names the failure it prevents, as the other traps do, and an eval case
-shows the skill loading when a scheduled agent workflow (§11) is written.
+shows the skill loading when an unattended agent workflow (§11) is written.
 
 ## Open questions
 
