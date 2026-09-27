@@ -1,7 +1,8 @@
 #!/bin/bash
 # check: SessionStart hook; says when this project's tracked files have changed by more than
 #        DOC_AUDIT_CHANGED_LINES (default 500) lines since its last documentation audit, or when
-#        no audit commit is reachable. Silent for a directory with neither CLAUDE.md nor docs/.
+#        no audit commit is reachable. Silent for a directory with no CLAUDE.md, AGENTS.md or
+#        docs/.
 # mark:  prints the trailer that records an audit; the audit's commit carries it as its last line.
 set -euo pipefail
 
@@ -13,7 +14,7 @@ mark)
     echo "Doc-Audit: $(date +%F)"
     ;;
 check)
-    [ -f "$project/CLAUDE.md" ] || [ -d "$project/docs" ] || exit 0
+    [ -f "$project/CLAUDE.md" ] || [ -f "$project/AGENTS.md" ] || [ -d "$project/docs" ] || exit 0
     threshold=${DOC_AUDIT_CHANGED_LINES:-500}
     offer="Offer the owner the conventions doc-audit skill in one line early in the session;"
     offer="$offer do not start it unasked."

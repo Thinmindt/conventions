@@ -144,18 +144,20 @@ Both are covered by `scripts/test_scripts.sh`.
 
 ## 8. An agent guide here, and AGENTS.md for other tools
 
-This repository's agent guide is `AGENTS.md`, with `CLAUDE.md` importing it, so tools other than
-Claude Code read it too. Projects touched by Codex, Copilot, Warp or Cursor still get none of
-these conventions until `init` (§7) writes them one.
+This repository's agent guide is `AGENTS.md` alone. Claude Code reads an `AGENTS.md` when no
+`CLAUDE.md` is in the working directory or above it, and `claude plugin validate --strict` (§1)
+refuses a `CLAUDE.md` at a plugin root, so one file serves every tool. Projects touched by Codex,
+Copilot, Warp or Cursor still get none of these conventions until `init` (§7) writes them one.
 
 - [x] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, the
   version rule as §13 settles it, keep `check_private.sh` identical to its template, and where
-  plans and the survey live. Add `CLAUDE.md` holding `@AGENTS.md`.
+  plans and the survey live. No `CLAUDE.md`, here or in any directory above a checkout, since
+  one would hide `AGENTS.md` from Claude Code.
 - [ ] The agent guide that `conventions-project init` writes (§7) follows the same shape and points
   at `docs/STYLE.md`, so tools other than Claude Code read the conventions too.
 
-**Done means:** both files exist, `AGENTS.md` is under 60 lines, and nothing in it is also stated in
-the README.
+**Done means:** `AGENTS.md` exists, is under 60 lines, and nothing in it is also stated in the
+README.
 
 ## 9. How a change is carried out
 

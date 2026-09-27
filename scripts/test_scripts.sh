@@ -21,8 +21,11 @@ expect() {
 # after one, reminds once enough has changed since it, and says so when a shallow clone hides it.
 audit=$root/skills/doc-audit/doc-audit.sh
 expect "doc-audit: mark prints the trailer" "Doc-Audit: $(date +%F)" "$(bash "$audit" mark)"
-mkdir -p "$work/nodocs" "$work/project/docs"
+mkdir -p "$work/nodocs" "$work/agents" "$work/project/docs"
 expect "doc-audit: no docs, no reminder" "" "$(CLAUDE_PROJECT_DIR=$work/nodocs bash "$audit" check)"
+touch "$work/agents/AGENTS.md"
+expect "doc-audit: AGENTS.md counts as docs" yes \
+    "$(CLAUDE_PROJECT_DIR=$work/agents bash "$audit" check | grep 'No documentation audit' >/dev/null && echo yes)"
 export CLAUDE_PROJECT_DIR=$work/project
 reminder() { bash "$audit" check | grep "$1" >/dev/null && echo yes; }
 expect "doc-audit: docs but no repository, reminder" yes "$(reminder 'No documentation audit')"

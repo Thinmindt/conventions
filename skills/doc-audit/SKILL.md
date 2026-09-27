@@ -34,7 +34,7 @@ backed up, and report any that is not.
 
 ## The project's own rules
 
-Read the project's agent guide (`CLAUDE.md`) for documentation rules of its own — how its
+Read the project's agent guide (`CLAUDE.md` or `AGENTS.md`) for documentation rules of its own — how its
 roadmap is numbered, what must be backed up after an edit, which pages need a screenshot — and
 apply them alongside the checks below. Run every check script the project has; its privacy
 check in particular (below) is where project-specific private terms are defined.
@@ -70,7 +70,7 @@ Where two documents disagree, reality decides, not the newer document.
 | source comments | what the code cannot say; spartan, present tense |
 | design document | why the code is as it is: the decision, its reason, its date |
 | roadmap and its archive | the plan as it stands; what was done and why it changed |
-| agent guide (`CLAUDE.md`) | the traps an agent must not fall into, and how to work here |
+| agent guide (`CLAUDE.md`, `AGENTS.md`) | the traps an agent must not fall into, and how to work here |
 | README | what a stranger needs to install and use it |
 | local notes (`CLAUDE.local.md`) | this machine and its owner |
 | to-do list and its archive | what only the owner can do |

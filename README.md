@@ -18,8 +18,8 @@ Three skills, loaded when the work calls for them:
   It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
   unchanged; a project adds its own terms with `scripts/private_terms.sh`.
 
-A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
-`docs/` directory has changed by more than 500 lines since its last audit, or has no audit
+A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md`, an
+`AGENTS.md` or a `docs/` directory has changed by more than 500 lines since its last audit, or no audit
 recorded (`DOC_AUDIT_CHANGED_LINES` changes the threshold). An audit is recorded by a
 `Doc-Audit: <date>` trailer on the commit that carries it, so it travels with the repository and
 nothing is written outside the tree.
