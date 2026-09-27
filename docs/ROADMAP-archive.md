@@ -22,6 +22,45 @@ install Claude Code natively, not through a package the gate could pin; CI insta
 npm. `--strict` fails a skill with no name or description, but not malformed YAML in the front
 matter, which it reads leniently.
 
+## 2. Trigger the audit by change, not by time (moved 2026-09-27)
+
+Thirty days stands in for how much has changed, and stands in badly: a project untouched for a
+year has nothing new to audit, and one that changed heavily last week does. The stamp under
+`~/.local/state` is also per machine, so an ephemeral machine, such as a cloud session container,
+reports "no audit recorded" in every session, and a second workstation repeats an audit already
+done.
+
+- [x] `doc-audit.sh mark` prints a `Doc-Audit: <date>` trailer for the audit's commit, so the
+  commit that carries the audit's fixes also marks the state that was audited. The commit's body is
+  the audit's report, so the findings travel with the state they describe (§16). Nothing is written
+  outside the tree; the state directory goes, and `DOC_AUDIT_DAYS` with it.
+- [x] `doc-audit.sh check` finds the newest commit with that trailer and measures what has changed
+  since it: lines added and removed in tracked files (`git diff --numstat`), working tree
+  included. It reminds when the total passes `DOC_AUDIT_CHANGED_LINES`, or when no audit commit
+  exists, and the message gives the audit's date, the lines changed and the threshold.
+- [x] The default threshold is a measurement, not a guess, and 500 is a guess. Take the lines a
+  few months of ordinary work changed in a real project (`git diff --shortstat` against the
+  commit of three months ago), set the default from it, and record the number and its date in
+  the archive.
+- [x] Code counts as well as documents, because documents rot most when the code moves and they
+  stand still. Untracked documents (`CLAUDE.local.md`, notes) are outside git's view, so nothing
+  triggers on them; the skill says they are checked whenever an audit runs for any other reason.
+- [x] In a shallow clone the audit commit may lie beyond the cut. When no trailer is reachable and
+  `git rev-parse --is-shallow-repository` says true, `check` says it cannot tell, rather than
+  reminding.
+- [x] Update the skill's "Report" and "Between audits" sections, the README and
+  `scripts/test_scripts.sh`.
+
+**Done means:** in a fresh clone on any machine, `check` is silent right after an audit commit and
+reminds once enough has changed since it. `scripts/test_scripts.sh` covers no audit, a fresh
+audit, churn past the threshold, and a shallow clone.
+
+The threshold was not measured. What matters is how much change may have put a document out of
+date, and that can be one line, so no measurement of past churn answers it. The default is 2000
+lines, the size of a large feature or a set of smaller ones, chosen by judgement on 2026-09-27
+and to be adjusted by how the audits feel. `--numstat` replaced `--shortstat` in the script
+because it sums cleanly.
+
 ## 13. CI and release hygiene (moved 2026-09-27)
 
 - [x] Pin `actions/checkout` and `astral-sh/setup-uv` to commit SHAs, with the version as a comment.

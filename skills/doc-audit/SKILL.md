@@ -153,13 +153,14 @@ the audit.
 ## Between audits
 
 The reminder at session start comes when more than `DOC_AUDIT_CHANGED_LINES` lines (default
-500) of tracked files have changed since the last audit commit, working tree included, or when
+2000) of tracked files have changed since the last audit commit, working tree included, or when
 no audit commit is reachable. Code counts as well as documents: documents rot most when the code
 moves and they stand still. Untracked documents are outside git's view, so nothing triggers on
 them; they are checked whenever an audit runs for any other reason. In a shallow clone the audit
 commit may lie beyond the cut, and the reminder says it cannot tell.
 
-To set the threshold for a project, measure rather than guess: the churn of a quarter's ordinary
-work is `git diff --shortstat $(git rev-list -1 --before='3 months ago' HEAD)`. Between audits,
-drift you notice while working is fixed if it is in a file you are already changing and
+The default is the size of a large feature or a few small ones, a judgement rather than a
+measurement, since one line can put a document out of date and no count says which. Set it per
+project by how the audits feel: too much found means lower, nothing found means higher. Between
+audits, drift you notice while working is fixed if it is in a file you are already changing and
 mentioned otherwise, with an offer to run this audit.
