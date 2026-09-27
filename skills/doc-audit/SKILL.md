@@ -86,8 +86,9 @@ it; rewriting pushed history is the owner's decision.
 
 Every public project carries the check that enforces this, `scripts/check_private.sh`,
 generated unchanged from the conventions template (`template/scripts/check_private.sh`) and run
-first by the project's gate script. It fails when a term appears in a tracked or about-to-be-added file, or in the author,
-committer or message of a commit no remote has yet. Its terms come from two places:
+first by the project's gate script. It fails when a term appears in a tracked or about-to-be-added
+file, or in the author, committer or message of a commit no remote has yet. Its terms come from
+two places:
 
 - `.private-terms`, gitignored, one per line: the addresses, hostnames and tokens of this
   installation. Add to it whenever a new one turns up.
