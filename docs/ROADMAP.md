@@ -138,7 +138,8 @@ Copying `docs/STYLE.md` and `check_private.sh` is manual, and so is the `diff` t
     `scripts/check_private.sh`, a `scripts/check.sh` skeleton, the CI workflow, the pre-push hook
     (§4) and a short agent guide (§8).
   - `check` reports each copied file that differs from its template and exits non-zero.
-- [ ] Replace the README's manual `diff` with `conventions-project check`, and have doc-audit run it.
+- [ ] Replace the README's manual `diff` with `conventions-project check`, and have doc-audit run
+  it.
 
 **Done means:** `init` in an empty git repository gives a project whose `scripts/check.sh` passes.
 After one line of its `docs/STYLE.md` is edited, `check` names that file and fails. Both are
@@ -257,8 +258,8 @@ does. So this is a skill of its own, not a section in python-traps, and it loads
   plugin or permission settings, whatever the project's language.
 
 **Done means:** each rule names the failure it prevents, as the other traps do, and an eval case
-(§5) shows the skill loading when an unattended agent workflow (§11) is written in a project with no
-Python.
+(§5) shows the skill loading when an unattended agent workflow (§11) is written in a project with
+no Python.
 
 ## 15. Hold out scenarios the agent cannot see
 
