@@ -12,6 +12,7 @@ if ! cmp -s skills/doc-audit/check_private.sh scripts/check_private.sh; then
     echo "scripts/check_private.sh has drifted from the template in skills/doc-audit/" >&2
     exit 1
 fi
+bash scripts/check_version.sh
 files '*.json' | xargs -0 -n1 python3 -m json.tool >/dev/null
 files '*.sh' | xargs -0 "${shellcheck[@]}"
 files | xargs -0 "${codespell[@]}"

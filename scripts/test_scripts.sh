@@ -1,6 +1,6 @@
 #!/bin/bash
-# Exercises doc-audit.sh, the check_private.sh template and check_examples.sh in throwaway
-# directories.
+# Exercises doc-audit.sh, the check_private.sh template, check_examples.sh and check_version.sh
+# in throwaway directories.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
@@ -84,5 +84,28 @@ return 1 +
 MD
 expect "check_examples: example that does not parse" yes \
     "$(examples | grep 'SKILL.md:2: invalid syntax' >/dev/null && echo yes)"
+
+# check_version.sh: a change under skills/ needs a new version, compared with origin/main.
+bare=$work/origin.git
+git init -q --bare "$bare"
+plugin=$work/plugin
+mkdir -p "$plugin/.claude-plugin" "$plugin/skills/one" "$plugin/scripts"
+git -C "$plugin" init -q -b main
+git -C "$plugin" config user.name Tester
+git -C "$plugin" config user.email tester@example.org
+git -C "$plugin" remote add origin "$bare"
+cp "$root/scripts/check_version.sh" "$plugin/scripts/"
+echo '{"name": "p", "version": "1.0.0"}' >"$plugin/.claude-plugin/plugin.json"
+echo "rule" >"$plugin/skills/one/SKILL.md"
+version_status() { bash "$plugin/scripts/check_version.sh" >/dev/null 2>&1 && echo pass || echo fail; }
+git -C "$plugin" add -A
+git -C "$plugin" commit -q -m "first"
+expect "check_version: no origin/main, skipped" pass "$(version_status)"
+git -C "$plugin" push -q -u origin main
+expect "check_version: nothing differs" pass "$(version_status)"
+echo "another rule" >>"$plugin/skills/one/SKILL.md"
+expect "check_version: skill changed, version not" fail "$(version_status)"
+echo '{"name": "p", "version": "1.1.0"}' >"$plugin/.claude-plugin/plugin.json"
+expect "check_version: skill changed, version bumped" pass "$(version_status)"
 
 [ "$failures" -eq 0 ] || exit 1

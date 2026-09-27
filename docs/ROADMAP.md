@@ -5,7 +5,7 @@ change that earns it. Finished items move verbatim to `ROADMAP-archive.md` under
 with the date they moved. Numbers never change. The reasoning behind most entries is in
 [survey-2026-09.md](survey-2026-09.md).
 
-The numbers give the intended order. 1, 2, 8 and 13 are small and independent. 5 comes before
+The numbers give the intended order. 1, 2 and 8 are small and independent. 5 comes before
 the new skills (6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after
 what they hold out and measure (5, 6, 11).
 
@@ -234,18 +234,6 @@ not name them. A rule a linter enforces needs no agent to remember it.
 
 **Done means:** every rule in both skills is marked either with the linter that enforces it or as
 judgement. A project seeded by `init` fails its gate on `log.info(f"...")`.
-
-## 13. CI and release hygiene
-
-- [ ] Pin `actions/checkout` and `astral-sh/setup-uv` to commit SHAs, with the version as a comment.
-  Set `permissions: contents: read` on the workflow.
-- [ ] Either stop hand-bumping by dropping `version` from `plugin.json` (installs then track the
-  commit), or have the gate fail when `skills/`, `hooks/` or `agents/` differ from `origin/main`
-  and the version does not. Choose one, and update the README's "Updating" section.
-- [ ] Tag releases with `claude plugin tag` if versions stay.
-
-**Done means:** the workflow runs green with SHA-pinned actions and read-only permissions, and a
-change to a skill without a version decision fails the gate or needs no decision.
 
 ## 14. Traps for running agents unattended
 

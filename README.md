@@ -32,7 +32,8 @@ of that date.
 ## Checks
 
 `scripts/check.sh` runs every gate, locally and in CI: the privacy check (and that its copy still
-matches the template), the JSON files parse, shellcheck, codespell, `scripts/check_examples.sh`,
+matches the template), `scripts/check_version.sh` (a change to what the plugin ships comes with a
+version bump), the JSON files parse, shellcheck, codespell, `scripts/check_examples.sh`,
 which parses every `python` example in the skills and runs ruff over them with the rules the guide
 itself states, and `scripts/test_scripts.sh`, which exercises the scripts in throwaway directories.
 It needs `uv`; the tools run through `uvx` at pinned versions.
@@ -57,7 +58,15 @@ This project follows [the conventions style guide](https://github.com/Thinmindt/
 
 ## Updating
 
-After a change, bump `version` in `.claude-plugin/plugin.json` and push. Then on each machine:
+A change to `skills/`, `hooks/` or `agents/` bumps `version` in `.claude-plugin/plugin.json`;
+the gate compares both with `origin/main` and refuses the change if the version stayed. Once the
+change is on main, tag the release from a clean checkout of it:
+
+```
+claude plugin tag --push
+```
+
+Then on each machine:
 
 ```
 claude plugin marketplace update conventions
