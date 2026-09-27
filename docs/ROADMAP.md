@@ -5,9 +5,9 @@ change that earns it. Finished items move verbatim to `ROADMAP-archive.md` under
 with the date they moved. Numbers never change. The reasoning behind most entries is in
 [survey-2026-09.md](survey-2026-09.md).
 
-The numbers give the intended order. 2 and 8 are small and independent. 5 comes before
-the new skills (6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after
-what they hold out and measure (5, 6, 11).
+The numbers give the intended order. 2 and 8 each keep one box open, waiting on a measurement
+and on §7. 5 comes before the new skills (6, 9, 10, 14), so each one can be shown to earn its
+place. 15 and 16 come after what they hold out and measure (5, 6, 11).
 
 ## 2. Trigger the audit by change, not by time
 
@@ -144,11 +144,11 @@ Both are covered by `scripts/test_scripts.sh`.
 
 ## 8. An agent guide here, and AGENTS.md for other tools
 
-This repository has no CLAUDE.md or AGENTS.md, though doc-audit's table gives the agent guide a
-role. The rules a contributor must know are in the README or nowhere. Projects touched by Codex,
-Copilot, Warp or Cursor get none of these conventions.
+This repository's agent guide is `AGENTS.md`, with `CLAUDE.md` importing it, so tools other than
+Claude Code read it too. Projects touched by Codex, Copilot, Warp or Cursor still get none of
+these conventions until `init` (§7) writes them one.
 
-- [ ] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, the
+- [x] `AGENTS.md` here, as a table of contents of under 60 lines: run `scripts/check.sh`, the
   version rule as §13 settles it, keep `check_private.sh` identical to its template, and where
   plans and the survey live. Add `CLAUDE.md` holding `@AGENTS.md`.
 - [ ] The agent guide that `conventions-project init` writes (§7) follows the same shape and points

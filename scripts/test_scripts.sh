@@ -116,7 +116,7 @@ version_status() { bash "$plugin/scripts/check_version.sh" >/dev/null 2>&1 && ec
 git -C "$plugin" add -A
 git -C "$plugin" commit -q -m "first"
 expect "check_version: no origin/main, skipped" pass "$(version_status)"
-git -C "$plugin" push -q -u origin main
+git -C "$plugin" push -q -u origin main 2>/dev/null
 expect "check_version: nothing differs" pass "$(version_status)"
 echo "another rule" >>"$plugin/skills/one/SKILL.md"
 expect "check_version: skill changed, version not" fail "$(version_status)"
