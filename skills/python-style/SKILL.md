@@ -1,6 +1,6 @@
 ---
 name: python-style
-description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md, a decision log) so it is still true months later, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. To seed a new project, copy everything below this front matter to docs/STYLE.md.
+description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md, a decision log) so it is still true months later, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
 ---
 
 # Python Style Guide

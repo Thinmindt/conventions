@@ -15,5 +15,6 @@ fi
 files '*.json' | xargs -0 -n1 python3 -m json.tool >/dev/null
 files '*.sh' | xargs -0 "${shellcheck[@]}"
 files | xargs -0 "${codespell[@]}"
+bash scripts/check_examples.sh
 bash scripts/test_scripts.sh
 echo "all checks passed"

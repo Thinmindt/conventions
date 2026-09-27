@@ -58,8 +58,11 @@ has no reason to load a skill called python-style.
 
 - [ ] New skill `docs-style`: "Design documents" and "Plans" from python-style, moved verbatim.
   python-style keeps a one-line pointer to it.
-- [ ] Update the cross-references in doc-audit and the README. Decide whether a project's
-  `docs/STYLE.md` carries both skills, and update the drift `diff` in the README to match.
+- [ ] Update the cross-references in doc-audit and the README, and have the `docs/STYLE.md` line
+  link both skills.
+- [ ] If the context-cost measurement (§5) shows python-style's load is the expensive part, move
+  the Tooling section into a reference file the skill names and Claude reads on demand, so the
+  body is the rules. Not before the measurement.
 
 **Done means:** python-style mentions no document type other than docstrings and comments. An eval
 case (§5) shows `docs-style` loading when a design document is edited in a project with no Python.
@@ -98,7 +101,9 @@ result.
     design-document entry for docs-style;
   - one negative case, a JavaScript task that loads no Python skill;
   - one behaviour case per skill, for example a narrated `if` gets a name, or a `yield` under a
-    lock is refused.
+    lock is refused. For doc-audit, a README that names a flag the code has removed: the
+    audit's report lists it under Fixed. Today the audit is a procedure in prose and nothing
+    shows it finds a stale fact when one is planted.
 - [ ] Run with `--ablation with-without`, so each skill's effect is measured against no plugin.
 - [ ] Record each skill's context cost (`claude plugin details`), with the date. Try a `paths:`
   scope on python-style and keep it if no triggering case regresses.
@@ -131,19 +136,20 @@ that has the new entry in the chosen file and passes `scripts/check.sh`.
 
 ## 7. Set up a project, and check it for drift
 
-Copying `docs/STYLE.md` and `check_private.sh` is manual, and so is the `diff` that finds drift.
+A project takes one copied file from this plugin, `check_private.sh`, and writing it, the gate
+skeleton and the CI workflow is manual. (`docs/STYLE.md` used to be a copy too; it is now one
+line linking to the guide, so it cannot drift.)
 
 - [ ] A plugin executable, `bin/conventions-project`.
-  - `init` writes the files a project takes from this plugin: `docs/STYLE.md`,
+  - `init` writes the files a project takes from this plugin: the one-line `docs/STYLE.md`,
     `scripts/check_private.sh`, a `scripts/check.sh` skeleton, the CI workflow, the pre-push hook
     (§4) and a short agent guide (§8).
-  - `check` reports each copied file that differs from its template and exits non-zero.
-- [ ] Replace the README's manual `diff` with `conventions-project check`, and have doc-audit run
-  it.
+  - `check` reports a `check_private.sh` that differs from its template and exits non-zero.
+- [ ] Have doc-audit run `conventions-project check`.
 
 **Done means:** `init` in an empty git repository gives a project whose `scripts/check.sh` passes.
-After one line of its `docs/STYLE.md` is edited, `check` names that file and fails. Both are
-covered by `scripts/test_scripts.sh`.
+After one line of its `scripts/check_private.sh` is edited, `check` names that file and fails.
+Both are covered by `scripts/test_scripts.sh`.
 
 ## 8. An agent guide here, and AGENTS.md for other tools
 
@@ -275,7 +281,8 @@ that could run it also runs an agent.
   directory on the same machine is the weaker option: the agent runs shell commands, and one
   machine holds both.
 - [ ] Decide how scenarios get in: written by a person, and never copied from the public suite,
-  which the agent has seen.
+  which the agent has seen. The first is a stale-fact case of the same kind as doc-audit's
+  behaviour case in §5, with a different seed.
 - [ ] Run it on demand and before a release (§13), not on every push; it costs tokens and
   credentials.
 
