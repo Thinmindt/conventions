@@ -5,20 +5,9 @@ change that earns it. Finished items move verbatim to `ROADMAP-archive.md` under
 with the date they moved. Numbers never change. The reasoning behind most entries is in
 [survey-2026-09.md](survey-2026-09.md).
 
-The numbers give the intended order. 1, 2 and 8 are small and independent. 5 comes before
+The numbers give the intended order. 2 and 8 are small and independent. 5 comes before
 the new skills (6, 9, 10, 14), so each one can be shown to earn its place. 15 and 16 come after
 what they hold out and measure (5, 6, 11).
-
-## 1. Validate the plugin in the gate
-
-`claude plugin validate --strict` checks the manifests and every skill's front matter. It passes
-today, but nothing runs it.
-
-- [ ] Add it to `scripts/check.sh`, pinned to a Claude Code version the way shellcheck and codespell
-  are pinned. First confirm it runs without credentials on CI. If it does not, the gate skips it
-  with a message, as the privacy check does with no terms.
-
-**Done means:** a SKILL.md with broken front matter fails `scripts/check.sh` locally and in CI.
 
 ## 2. Trigger the audit by change, not by time
 

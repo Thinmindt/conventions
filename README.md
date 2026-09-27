@@ -33,7 +33,9 @@ of that date.
 
 `scripts/check.sh` runs every gate, locally and in CI: the privacy check (and that its copy still
 matches the template), `scripts/check_version.sh` (a change to what the plugin ships comes with a
-version bump), the JSON files parse, shellcheck, codespell, `scripts/check_examples.sh`,
+version bump), the JSON files parse, `claude plugin validate --strict` over the manifests and
+the skills (with the `claude` on PATH, or skipped with a message; CI installs a pinned version),
+shellcheck, codespell, `scripts/check_examples.sh`,
 which parses every `python` example in the skills and runs ruff over them with the rules the guide
 itself states, and `scripts/test_scripts.sh`, which exercises the scripts in throwaway directories.
 It needs `uv`; the tools run through `uvx` at pinned versions.

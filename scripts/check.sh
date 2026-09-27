@@ -14,6 +14,19 @@ if ! cmp -s skills/doc-audit/check_private.sh scripts/check_private.sh; then
 fi
 bash scripts/check_version.sh
 files '*.json' | xargs -0 -n1 python3 -m json.tool >/dev/null
+# The manifests and every skill's front matter, as the Claude Code on PATH reads them; CI
+# installs the version in .github/workflows/check.yml.
+if command -v claude >/dev/null; then
+    for target in .claude-plugin/marketplace.json .claude-plugin/plugin.json skills; do
+        if ! report=$(claude plugin validate --strict "$target" 2>&1); then
+            echo "$report" >&2
+            exit 1
+        fi
+    done
+    echo "plugin validate: manifests and skills valid ($(claude --version))"
+else
+    echo "plugin validate: claude is not on PATH, skipped"
+fi
 files '*.sh' | xargs -0 "${shellcheck[@]}"
 files | xargs -0 "${codespell[@]}"
 bash scripts/check_examples.sh
