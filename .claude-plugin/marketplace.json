@@ -6,7 +6,7 @@
     {
       "name": "conventions",
       "source": "./",
-      "description": "The Python style guide, the design-document rule, the traps each paid for once, and a periodic documentation audit"
+      "description": "The Python style guide, the design-document rule, the traps each paid for once, and a documentation audit offered once enough has changed"
     }
   ]
 }

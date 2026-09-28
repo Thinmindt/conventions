@@ -5,8 +5,9 @@ and is not restated.
 
 ## What this is
 
-A Claude Code plugin: the skills under `skills/`, the session-start hook in `hooks/`, and the
-scripts that check them. What each skill does, and how the plugin is installed: the README.
+A Claude Code plugin and the Copier template beside it: the skills under `skills/`, the
+session-start hooks in `hooks/`, the template under `template/`, and the scripts that check them.
+What each skill does, and how the plugin is installed: the README.
 
 ## Before a change is done
 
@@ -23,7 +24,7 @@ scripts that check them. What each skill does, and how the plugin is installed: 
   documents" and "Plans". They apply to `docs/` here.
 - What a project is generated from: `copier.yml` and `template/`, described under "In a
   project" in the README. `scripts/check_private.sh` here is this repository's own copy of the
-  template's, and the gate keeps the two identical.
+  template's.
 
 ## Habits
 

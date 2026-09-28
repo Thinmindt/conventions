@@ -2,6 +2,6 @@
   "name": "conventions",
   "version": "1.4.0",
   "author": { "name": "Thinmindt" },
-  "description": "Conventions for every project: the Python style guide (with the rule for design documents), python-traps, the rules for threads, files, services and public repos that were each paid for once, and doc-audit, a periodic check that every document is true, current, in one place, private where it should be and general.",
+  "description": "Conventions for every project: the Python style guide (with the rule for design documents), python-traps, the rules for threads, files, services and public repos that were each paid for once, and doc-audit, a check offered once enough has changed that every document is true, current, in one place, private where it should be and general.",
   "repository": "https://github.com/Thinmindt/conventions"
 }

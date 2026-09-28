@@ -12,11 +12,12 @@ Three skills, loaded when the work calls for them:
   else's thread, files that must survive a crash, network filesystems, services under systemd,
   uv with apt-only packages, and what may go in a public repository. Each names the failure it
   prevents; each was paid for once.
-- **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
-  the code and the machine, current (plans are the plan as it stands, history archived), each
-  fact in one place, nothing private, nothing tied to one installation or one person's settings.
-  The privacy check every project's gate runs first, `scripts/check_private.sh`, is generated
-  from the template below; a project adds its own terms with `scripts/private_terms.sh`.
+- **doc-audit** — a hard look, once enough has changed, at every document in a project, tracked or
+  not: true to the code and the machine, current (plans are the plan as it stands, history
+  archived), each fact in one place, nothing private, nothing tied to one installation or one
+  person's settings. The privacy check every project's gate runs first, `scripts/check_private.sh`,
+  is generated from the template below; a project adds its own terms with
+  `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md`, an
 `AGENTS.md` or a `docs/` directory has changed by more than 2000 lines since its last audit, or
@@ -81,7 +82,7 @@ change is on main, tag the release from a clean checkout of it, as `v<version>`,
 form Copier reads (roadmap §7):
 
 ```
-git tag -a v1.3.0 -m "conventions 1.3.0" && git push origin v1.3.0
+git tag -a v1.4.0 -m "conventions 1.4.0" && git push origin v1.4.0
 ```
 
 Then on each machine:
