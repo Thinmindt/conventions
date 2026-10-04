@@ -14,8 +14,8 @@ Three skills, loaded when the work calls for them:
   prevents; each was paid for once.
 - **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
   the code and the machine, current (plans are the plan as it stands, history archived), each
-  fact in one place, nothing private, nothing tied to one installation or one person's settings.
-  It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
+  fact in one place, shaped so a stranger could draw the system from it, nothing private, nothing
+  tied to one installation or one person's settings. It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
   unchanged; a project adds its own terms with `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a

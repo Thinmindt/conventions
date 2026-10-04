@@ -1,6 +1,6 @@
 ---
 name: python-style
-description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md, a decision log) so it is still true months later, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
+description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md: the decisions as evidence under the mechanisms they shaped, with diagrams) so it is still true months later and can be read whole, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
 ---
 
 # Python Style Guide
@@ -104,6 +104,26 @@ Then the rules that follow from that:
 
 The test is the same one as for comments, one level up: would the sentence still be true and
 still be useful if the reader had no idea when it was written?
+
+An entry is one decision; a project makes a hundred, and the order they were made in is the
+worst order to read them in. The document's shape:
+
+- **Sections are mechanisms, in the order the data flows.** Each is one thing the system does
+  and opens with how that works today: a paragraph a stranger could draw the mechanism from,
+  and a picture where there is a flow, a state machine or more than one thread. The entries
+  follow as the evidence under it.
+- **A principle is stated once**, where it governs; an entry that applies it says so in a
+  clause. The same reason written under five entries reads as five facts and drifts as five.
+- **An entry holds a measurement or a failure.** A decision whose whole reason fits in a
+  sentence is a clause in its mechanism's opening, not an entry.
+- **Pictures are text in the document**, Mermaid in a fenced block, so they diff, are reviewed
+  and render where the document is read. Draw top to bottom: a left-to-right flow of more than
+  a few boxes scales to illegibility at page width. A box or an arrow is a claim about the
+  code, checked like a sentence, and a picture is checked by rendering it and looking, since a
+  diagram that does not parse or cannot be read passes every text check.
+- **Reorganize in steps a reviewer can check:** the moves alone first, proved by comparing the
+  paragraphs before and after; then the openings, as pure additions; then the merges, where
+  every deletion stands on its own.
 
 ## Plans
 

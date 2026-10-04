@@ -1,6 +1,6 @@
 ---
 name: doc-audit
-description: A hard look at every document in a project — tracked docs, local notes, to-do lists, agent memory and the install instructions of companion repos — so that each is true to the code and the machine, current (plans are the plan as it stands, history archived), stated once in the place it is most useful, safe to publish, and free of one installation's or one person's settings. Use when the session-start reminder says an audit is due, or when asked. During other work, when you notice a document that contradicts the code or the machine, a plan that is no longer the plan, a fact stated in two places, or a private or installation-specific detail in a tracked file, say so and offer this audit; do not start it unasked.
+description: A hard look at every document in a project — tracked docs, local notes, to-do lists, agent memory and the install instructions of companion repos — so that each is true to the code and the machine, current (plans are the plan as it stands, history archived), stated once in the place it is most useful, shaped so a stranger could draw the system from it, safe to publish, and free of one installation's or one person's settings. Use when the session-start reminder says an audit is due, or when asked. During other work, when you notice a document that contradicts the code or the machine, a plan that is no longer the plan, a fact stated in two places, a design document whose entries read in the order they were written, or a private or installation-specific detail in a tracked file, say so and offer this audit; do not start it unasked.
 ---
 
 # Documentation audit
@@ -14,6 +14,8 @@ fixes it, on a schedule rather than by accident. Every document should come out 
 3. **In one place** — each fact lives where it is most useful, and everywhere else points there.
 4. **Safe to publish** — nothing private in a tracked file or a commit.
 5. **General** — nothing depends on one installation's hardware or one person's settings.
+6. **Shaped** — it can be read whole: its sections are the mechanisms, each opened by how it
+   works, with a picture where words would need a dozen entries.
 
 ## Take inventory first
 
@@ -79,6 +81,16 @@ Where two documents disagree, reality decides, not the newer document.
 Two statements of one fact are a contradiction waiting to happen: keep the one in the right home
 and cut or point the other. Rationale found in a source comment moves to the design document.
 
+**Shaped.** Read the document whole before any entry of it, and ask whether a stranger could
+draw the system from it. For a design document the shape is python-style's ("Design
+documents"): sections are the mechanisms in the order the data flows, each opening with how it
+works today and a picture where there is a flow, a state machine or more than one thread; a
+principle is stated once; an entry holds a measurement or a failure. The signs of the opposite:
+entries in the order they were written, one reason repeated under several entries, a section
+that is a third of the document and a grab-bag, a mechanism with a flow and no picture of it. A
+picture is a set of claims: each box and arrow is checked against the code like a sentence, and
+the picture is rendered and looked at, as a page change is.
+
 **Safe to publish.** Tracked files, commit messages and commit authors are public. Look for
 network addresses, hostnames, share names, tokens, personal email addresses, and people's and
 pets' names; anything private moves to a gitignored file. If it has already been pushed, report
@@ -127,6 +139,9 @@ carrying a copy of it, which would drift.
 - Keep the commands read-only while verifying: query, list and grep; do not start services.
 - When text moves to an archive, prove nothing was lost: every line of the old file appears in
   the new file or the archive, or is a rewrite you can name.
+- When a document is reorganized, do it in commits a reviewer can check: the moves alone,
+  proved the same way; then the additions; then the merges, where each deletion stands on its
+  own.
 - Run the project's checks before committing.
 
 ## Report
