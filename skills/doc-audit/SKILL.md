@@ -94,20 +94,23 @@ that is a third of the document and a grab-bag, a mechanism with a flow and no p
 picture is a set of claims: each box and arrow is checked against the code like a sentence, and
 the picture is rendered and looked at, as a page change is.
 
-**Readable.** Measure every tracked document with the script beside this skill:
+**Readable.** Measure every tracked document with the script beside this skill, the summary
+tiers first and the evidence after `--detail`:
 
 ```
-python3 ${CLAUDE_SKILL_DIR}/readability.py README.md docs/*.md
+python3 ${CLAUDE_SKILL_DIR}/readability.py README.md docs/*.md --detail docs/design/*.md
 ```
 
-It reports the average sentence, the long ones and every paragraph over budget, with its line.
-The budgets are python-style's ("Written for a person"); a number over budget is a finding, and
-the fix is a shorter sentence, a list, or a paragraph split where its argument turns, never the
-evidence cut. Then read each document's opening as a stranger would: does it say which question
-it answers, does it show the whole shape before the parts, is there an example of each artifact
-it describes, and are its words the glossary's? After a large change, run a cold read: an agent
-started with no memory of the project reads the opening for five minutes and lists what it could
-not answer, and each answer goes into the document.
+It reports the average sentence, the long ones and every paragraph over budget, with its line. The
+budgets are python-style's ("Written for a person") and bind the summary tiers: there a number
+over budget is a finding, and the fix is a shorter sentence, a list, a paragraph split where its
+argument turns, or detail moved down a tier, never the evidence cut. Evidence after `--detail` is
+measured for information; long sentences belong there, not above it. Then read each document's
+opening as a stranger would: does it say which question it answers, does it show the whole shape
+before the parts, is there an example of each artifact it describes, and are its words the
+glossary's? After a large change, run a cold read: an agent started with no memory of the project
+reads the opening for five minutes and lists what it could not answer, and each answer goes into
+the document.
 
 **Safe to publish.** Tracked files, commit messages and commit authors are public. Look for
 network addresses, hostnames, share names, tokens, personal email addresses, and people's and

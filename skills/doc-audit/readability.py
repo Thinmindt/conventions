@@ -1,12 +1,13 @@
 """Prose measurements for Markdown documents: what a reader meets, in numbers.
 
-Usage: python3 readability.py FILE.md [FILE.md ...]
+Usage: python3 readability.py SUMMARY.md [...] [--detail EVIDENCE.md ...]
 
 For each file: words, sentences, the average sentence and the long ones, the paragraphs over
 budget with their line numbers, headings and pictures. Fenced blocks and table rows are not
 prose and are left out. A list item is a paragraph of its own; a task item (`- [ ]`), which
-carries a spec and its done-means, has a budget of its own. A measuring tool, not a gate: it
-always exits 0.
+carries a spec and its done-means, has a budget of its own. The budgets bind the summary tiers;
+files after --detail are evidence, measured for information and marked so. A measuring tool,
+not a gate: it always exits 0.
 """
 
 import re
@@ -63,7 +64,7 @@ def blocks(text: str) -> tuple[list[tuple[int, str]], int, int]:
     return found, headings, pictures
 
 
-def report(path: Path) -> list[str]:
+def report(path: Path, detail: bool = False) -> list[str]:
     prose, headings, pictures = blocks(path.read_text())
     lengths = [
         len(sentence.split())
@@ -78,6 +79,12 @@ def report(path: Path) -> list[str]:
         for number, block in prose
         if len(block.split()) > (TASK_BUDGET if TASK_ITEM.match(block) else PARAGRAPH_BUDGET)
     ]
+    if detail:
+        return [
+            f"{path}: {words:,} words, {len(lengths)} sentences, {average:.1f} words a sentence,"
+            f" {sum(n > LONG_SENTENCE for n in lengths)} over {LONG_SENTENCE}; {len(over)}"
+            " paragraphs over the summary budget; evidence tier, budgets advisory"
+        ]
     lines = [
         f"{path}: {words:,} words, {len(lengths)} sentences, {average:.1f} words a sentence"
         f" (budget {SENTENCE_BUDGET}), {sum(n > LONG_SENTENCE for n in lengths)} over"
@@ -88,9 +95,13 @@ def report(path: Path) -> list[str]:
     return lines
 
 
-def main(paths: list[str]) -> int:
-    for path in paths:
-        print("\n".join(report(Path(path))))
+def main(args: list[str]) -> int:
+    detail = False
+    for arg in args:
+        if arg == "--detail":
+            detail = True
+            continue
+        print("\n".join(report(Path(arg), detail)))
     return 0
 
 

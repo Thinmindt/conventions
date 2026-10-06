@@ -122,6 +122,11 @@ worst order to read them in. The document's shape:
   page width decides, so render it there. A box or an arrow is a claim about the
   code, checked like a sentence, and a picture is checked by rendering it and looking, since a
   diagram that does not parse or cannot be read passes every text check.
+- **Evidence gets a document of its own when it outgrows its summary.** The design document
+  stays the map, readable in minutes: each mechanism's summary, with its picture, ends with a
+  link to its decisions in `docs/design/<domain>.md`. There each decision is a heading carrying
+  its date, under a contents list, so the list reads as a run of dated claims: a tier between a
+  summary and its evidence, and GitHub's outline navigates it.
 - **Reorganize in steps a reviewer can check:** the moves alone first, proved by comparing the
   paragraphs before and after; then the openings, as pure additions; then the merges, where
   every deletion stands on its own.
@@ -166,10 +171,12 @@ hurry, and one they cannot follow is as good as missing.
   Generality removes whose setup it was and what happened next, not how big it was.
 - **One word for one thing, defined once**, in a glossary the documents link to. The product's
   own words win, and spelling is consistent.
-- **Budgets, measured rather than guessed:** sentences averaging no more than about 22 words,
-  prose paragraphs under 150, a list for an enumeration and prose for an argument. A roadmap
-  item, which carries a spec and its done-means, gets 250. The doc-audit skill carries the
-  script that measures them.
+- **Budgets for the summary tiers, measured rather than guessed.** A README, a design
+  document's map and a roadmap's opening keep sentences averaging no more than about 22 words,
+  prose paragraphs under 150, a list for an enumeration and prose for an argument; a roadmap
+  item, which carries a spec and its done-means, gets 250. The evidence below a summary may run
+  as long as its topic needs, though a paragraph still splits where its argument turns. The
+  doc-audit skill carries the script that measures them.
 - **Read it cold.** A document nobody new has read is untested. After a large change, have
   someone without the context, a person or an agent started with no memory, read the opening for
   five minutes and write down what they could not answer; then answer it in the document.
