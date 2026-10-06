@@ -1,6 +1,6 @@
 ---
 name: python-style
-description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md: the decisions as evidence under the mechanisms they shaped, with diagrams) so it is still true months later and can be read whole, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
+description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md: the decisions as evidence under the mechanisms they shaped, with diagrams) so it is still true months later and can be read whole, how to keep a roadmap the plan as it stands, and how to write any project document for a person (one question per document, shape first, one home per fact, examples kept true by tests, a glossary, measured budgets, a cold read). Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a README, design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
 ---
 
 # Python Style Guide
@@ -117,8 +117,9 @@ worst order to read them in. The document's shape:
 - **An entry holds a measurement or a failure.** A decision whose whole reason fits in a
   sentence is a clause in its mechanism's opening, not an entry.
 - **Pictures are text in the document**, Mermaid in a fenced block, so they diff, are reviewed
-  and render where the document is read. Draw top to bottom: a left-to-right flow of more than
-  a few boxes scales to illegibility at page width. A box or an arrow is a claim about the
+  and render where the document is read. Long labels over many steps go top to
+  bottom; a chain of short labels, broken across lines, reads left to right. Either way the
+  page width decides, so render it there. A box or an arrow is a claim about the
   code, checked like a sentence, and a picture is checked by rendering it and looking, since a
   diagram that does not parse or cannot be read passes every text check.
 - **Reorganize in steps a reviewer can check:** the moves alone first, proved by comparing the
@@ -140,6 +141,38 @@ the one document allowed a pending state, because an unchecked box *is* the stat
   archive keeps the history under the number, and the roadmap keeps the plan.
 - A to-do list of things only the owner can do follows the same rule: open items only, done
   ones in its archive.
+- **It opens with where things stand**: what is built, what is under way, and what each open
+  item waits on, as the items themselves state it, in a picture where there are chains. A
+  reader should not need the whole file to learn what is next.
+
+## Written for a person
+
+Truth and currency are not enough: a document is read by someone who was not there, often in a
+hurry, and one they cannot follow is as good as missing.
+
+- **Each document answers one question, and says which.** The README: what is this for, and how
+  do I use it. The design document: how does it work, and why. The roadmap: what is next. An
+  agent guide: how do I work here without breaking anything.
+- **The shape first, then depth on demand.** Each document opens with the whole of its subject,
+  readable in five minutes: what it is for, a picture, the main parts. Each part then unfolds a
+  layer at a time; the complexity of the domain sets how deep, not the order things were written
+  in.
+- **One home per fact, where a reader would look for it.** A higher layer may summarise what a
+  deeper one states, as long as it points there. Two full statements in two homes drift apart.
+- **Concrete before abstract.** Show each artifact a reader meets, a file's contents, a row, a
+  log line, as the code writes it, and keep it true with a test that fails when the code moves.
+- **Evidence keeps its size.** A failure or a measurement that justifies a decision keeps its
+  numbers and date: "blocked for 3 h 46 min while the host's own heartbeat stayed green".
+  Generality removes whose setup it was and what happened next, not how big it was.
+- **One word for one thing, defined once**, in a glossary the documents link to. The product's
+  own words win, and spelling is consistent.
+- **Budgets, measured rather than guessed:** sentences averaging no more than about 22 words,
+  prose paragraphs under 150, a list for an enumeration and prose for an argument. A roadmap
+  item, which carries a spec and its done-means, gets 250. The doc-audit skill carries the
+  script that measures them.
+- **Read it cold.** A document nobody new has read is untested. After a large change, have
+  someone without the context, a person or an agent started with no memory, read the opening for
+  five minutes and write down what they could not answer; then answer it in the document.
 
 ## Docstrings
 

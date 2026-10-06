@@ -1,6 +1,6 @@
 ---
 name: doc-audit
-description: A hard look at every document in a project — tracked docs, local notes, to-do lists, agent memory and the install instructions of companion repos — so that each is true to the code and the machine, current (plans are the plan as it stands, history archived), stated once in the place it is most useful, shaped so a stranger could draw the system from it, safe to publish, and free of one installation's or one person's settings. Use when the session-start reminder says an audit is due, or when asked. During other work, when you notice a document that contradicts the code or the machine, a plan that is no longer the plan, a fact stated in two places, a design document whose entries read in the order they were written, or a private or installation-specific detail in a tracked file, say so and offer this audit; do not start it unasked.
+description: A hard look at every document in a project — tracked docs, local notes, to-do lists, agent memory and the install instructions of companion repos — so that each is true to the code and the machine, current (plans are the plan as it stands, history archived), stated once in the place it is most useful, shaped so a stranger could draw the system from it, readable by a person in a hurry, safe to publish, and free of one installation's or one person's settings. Use when the session-start reminder says an audit is due, or when asked. During other work, when you notice a document that contradicts the code or the machine, a plan that is no longer the plan, a fact stated in two places, a design document whose entries read in the order they were written, or a private or installation-specific detail in a tracked file, say so and offer this audit; do not start it unasked.
 ---
 
 # Documentation audit
@@ -16,6 +16,8 @@ fixes it, on a schedule rather than by accident. Every document should come out 
 5. **General** — nothing depends on one installation's hardware or one person's settings.
 6. **Shaped** — it can be read whole: its sections are the mechanisms, each opened by how it
    works, with a picture where words would need a dozen entries.
+7. **Readable** — a stranger gets its shape in five minutes, and its prose stays inside the
+   budgets python-style sets.
 
 ## Take inventory first
 
@@ -65,7 +67,8 @@ Where two documents disagree, reality decides, not the newer document.
 - A design document states decisions, never a pending state (see python-style, "Design
   documents").
 
-**In one place.** Decide where each fact belongs, then make every other mention a pointer:
+**In one place.** Decide where each fact belongs, the place a reader would look for it, then
+make every other mention a pointer, or a summary at a higher layer that points there:
 
 | document | holds |
 |---|---|
@@ -90,6 +93,21 @@ entries in the order they were written, one reason repeated under several entrie
 that is a third of the document and a grab-bag, a mechanism with a flow and no picture of it. A
 picture is a set of claims: each box and arrow is checked against the code like a sentence, and
 the picture is rendered and looked at, as a page change is.
+
+**Readable.** Measure every tracked document with the script beside this skill:
+
+```
+python3 ${CLAUDE_SKILL_DIR}/readability.py README.md docs/*.md
+```
+
+It reports the average sentence, the long ones and every paragraph over budget, with its line.
+The budgets are python-style's ("Written for a person"); a number over budget is a finding, and
+the fix is a shorter sentence, a list, or a paragraph split where its argument turns, never the
+evidence cut. Then read each document's opening as a stranger would: does it say which question
+it answers, does it show the whole shape before the parts, is there an example of each artifact
+it describes, and are its words the glossary's? After a large change, run a cold read: an agent
+started with no memory of the project reads the opening for five minutes and lists what it could
+not answer, and each answer goes into the document.
 
 **Safe to publish.** Tracked files, commit messages and commit authors are public. Look for
 network addresses, hostnames, share names, tokens, personal email addresses, and people's and
@@ -122,6 +140,9 @@ every tracked document. Look for:
   "this installation uses X; Y also works because…", and say which choices would change how
   well the project works.
 - Examples that use real names. Use made-up ones.
+- Evidence cut down in the name of generality. A measurement or an incident that justifies a
+  decision keeps its numbers and its date (python-style, "Written for a person"); generality
+  removes whose setup it was, not how big it was.
 - Hardware outside its boundary (python-style, "Hardware sits behind a boundary"). Every
   device library should be importable only inside its implementation, with the linter enforcing
   it; grep for its imports elsewhere, and for device-specific values (models, modes, formats,
