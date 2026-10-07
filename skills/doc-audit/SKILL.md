@@ -153,7 +153,9 @@ every tracked document. Look for:
 
 **Consistent with the conventions.** Comments and docstrings follow python-style; design entries
 give what, why and when; a project's `docs/STYLE.md` links to the python-style guide rather than
-carrying a copy of it, which would drift.
+carrying a copy of it, which would drift. A project that makes the readability budgets a gate
+copies `readability.py` into `scripts/` unchanged, as it does `check_private.sh`, and imports
+`measure()` in a test; its copy matches this skill's.
 
 ## How to run it
 
