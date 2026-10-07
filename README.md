@@ -70,6 +70,6 @@ claude plugin update conventions@conventions
 A skill's `description` is the only thing Claude reads before deciding whether to load it, so it
 is written for that decision and nothing else. First what the skill covers, in the words a task
 would use: the things being written, the libraries, the file types. Then `Use when`, naming the
-situations. Then, where a near miss is likely, what it does not cover. It does not summarise the
+situations. Then, where a near miss is likely, what it does not cover. It does not summarize the
 body, and it stays under 1024 characters, the limit Claude Code enforces. The three skills here
 are the pattern; a description that reads well but names no situation will not load.

@@ -6,7 +6,7 @@ description: The Python style guide for every project, plus the rule for design 
 # Python Style Guide
 
 Conventions for writing and reviewing Python in this project. Ruff and mypy enforce the
-mechanical parts; this document covers the judgement they cannot.
+mechanical parts; this document covers the judgment they cannot.
 
 The guiding idea: **the code should say what it does, and comments should say what the code
 cannot.** Most style debates resolve once you ask which of those two a line is doing.
@@ -45,12 +45,12 @@ find yourself writing `# --- validation ---`, that block is a function.
 
 ## Comments
 
-Comments describe **current behaviour**, not the reasoning that produced it. Keep them short.
+Comments describe **current behavior**, not the reasoning that produced it. Keep them short.
 Assume the reader is busy, competent, and already looking at the code.
 
 Write one when the code cannot state the fact itself:
 
-- surprising behaviour of a third-party call
+- surprising behavior of a third-party call
 - a constraint the code must respect
 - a non-obvious consequence a caller needs to know
 
@@ -162,7 +162,7 @@ hurry, and one they cannot follow is as good as missing.
   readable in five minutes: what it is for, a picture, the main parts. Each part then unfolds a
   layer at a time; the complexity of the domain sets how deep, not the order things were written
   in.
-- **One home per fact, where a reader would look for it.** A higher layer may summarise what a
+- **One home per fact, where a reader would look for it.** A higher layer may summarize what a
   deeper one states, as long as it points there. Two full statements in two homes drift apart.
 - **Concrete before abstract.** Show each artifact a reader meets, a file's contents, a row, a
   log line, as the code writes it, and keep it true with a test that fails when the code moves.
@@ -170,7 +170,7 @@ hurry, and one they cannot follow is as good as missing.
   numbers and date: "blocked for 3 h 46 min while the host's own heartbeat stayed green".
   Generality removes whose setup it was and what happened next, not how big it was.
 - **One word for one thing, defined once**, in a glossary the documents link to. The product's
-  own words win, and spelling is consistent.
+  own words win, and spelling is American, the same in prose and in code.
 - **Budgets for the summary tiers, measured rather than guessed.** A README, a design
   document's map and a roadmap's opening keep sentences averaging no more than about 22 words,
   prose paragraphs under 150, a list for an enumeration and prose for an argument; a roadmap
@@ -259,14 +259,14 @@ need to catch that specific failure, not merely to satisfy a linter.
 
 ## Tests
 
-**Assert something that would fail if the behaviour were deleted.** A test asserting only that a
+**Assert something that would fail if the behavior were deleted.** A test asserting only that a
 call did not raise usually passes forever, including after the feature is removed. Check the
 output, the state, or the side effect.
 
 **Mutation-check a regression test once.** Reintroduce the bug and confirm the test fails. A
 regression test that never failed has not been shown to work.
 
-**Fakes honour the real contract.** When production code starts calling a new method, the fake
+**Fakes honor the real contract.** When production code starts calling a new method, the fake
 grows it too. A fake that has silently diverged tests a shape that does not exist — and the
 symptom is often an exception inside a worker thread rather than a clean failure.
 
@@ -290,7 +290,7 @@ request context and take what you need from the generator directly.
 a desk size, read the screenshots, and only then call the change done.
 
 **Prove a comment-only change with the AST.** Parse each file before and after, strip the
-docstrings, and compare `ast.dump`. Equal dumps mean no behaviour changed.
+docstrings, and compare `ast.dump`. Equal dumps mean no behavior changed.
 
 ## Tooling
 
@@ -313,7 +313,7 @@ must be extracted rather than absorbed. Raise it deliberately, never to silence 
 
 **Exempt tests where the rule does not fit.** In test code the literals often *are* the expected
 values, `assert` is the mechanism, and fixtures are unused by design. Exempting those is honest;
-it is not licence to leave every literal bare, because a number that is a *threshold* rather than
+it is not license to leave every literal bare, because a number that is a *threshold* rather than
 an expected value still wants a name.
 
 **Every `noqa` carries its reason.** A bare code records only that someone silenced it.
