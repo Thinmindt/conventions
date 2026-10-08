@@ -94,6 +94,16 @@ that is a third of the document and a grab-bag, a mechanism with a flow and no p
 picture is a set of claims: each box and arrow is checked against the code like a sentence, and
 the picture is rendered and looked at, as a page change is.
 
+`render.py`, beside this skill, renders a Markdown file as GitHub shows it, diagrams included,
+and screenshots its first screen and the whole page. Read the images, not just its report that
+every diagram rendered:
+
+```
+python3 ${CLAUDE_SKILL_DIR}/render.py docs/DESIGN.md /tmp/rendered
+```
+
+It needs chromium and the network, and takes a minute or two a page.
+
 **Readable.** Measure every tracked document with the script beside this skill, the summary
 tiers first and the evidence after `--detail`:
 
@@ -105,9 +115,10 @@ It reports the average sentence, the long ones and every paragraph over budget, 
 budgets are python-style's ("Written for a person") and bind the summary tiers: there a number
 over budget is a finding, and the fix is a shorter sentence, a list, a paragraph split where its
 argument turns, or detail moved down a tier, never the evidence cut. Evidence after `--detail` is
-measured for information; long sentences belong there, not above it. Then read each document's
-opening as a stranger would: does it say which question it answers, does it show the whole shape
-before the parts, is there an example of each artifact it describes, and are its words the
+measured for information; long sentences belong there, not above it.
+
+Then read each document's opening as a stranger would, rendered (above): does it say which question it answers, does it
+show the whole shape before the parts, is there an example of each artifact it describes, and are its words the
 glossary's? After a large change, run a cold read: an agent started with no memory of the project
 reads the opening for five minutes and lists what it could not answer, and each answer goes into
 the document.
