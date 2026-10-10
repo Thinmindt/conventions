@@ -117,6 +117,11 @@ over budget is a finding, and the fix is a shorter sentence, a list, a paragraph
 argument turns, or detail moved down a tier, never the evidence cut. Evidence after `--detail` is
 measured for information; long sentences belong there, not above it.
 
+Beside the numbers, read the top tier's prose for its register (python-style, "The register
+follows the tier"): a figure in a README's prose, an aside in parentheses, or "the maintainer"
+where "you" would do is a finding there. The fix moves the figure to its table or the evidence and
+rewrites the sentence to the reader.
+
 Then read each document's opening as a stranger would, rendered (above): does it say which question it answers, does it
 show the whole shape before the parts, is there an example of each artifact it describes, and are its words the
 glossary's? After a large change, run a cold read: an agent started with no memory of the project
