@@ -155,9 +155,15 @@ every tracked document. Look for:
   paths, sudo rights). Replace them with a check the repository runs or a requirement stated
   for every user.
 - Installation-specific values written as if universal (a device model, a count, a network
-  service, a screen size). Make them configuration with a documented default, or state them as
-  "this installation uses X; Y also works because…", and say which choices would change how
-  well the project works.
+  service, a screen size). Make them configuration with a documented default, or state the
+  requirement every installation must meet, and say which choices would change how well the
+  project works.
+- One installation's own record: its counts, progress, free space, incidents, hardware and
+  services, and phrasing such as "this installation's" or "the owner's". Tracked documents
+  describe the project, not the setup it was built on, so err on the side of sharing less. A
+  dated measurement may stay where it justifies a default, without saying whose setup it came
+  from; the rest goes in a gitignored local note. Each installation works out its own details,
+  and another one's are noise, more so with more than one contributor.
 - Examples that use real names. Use made-up ones.
 - Evidence cut down in the name of generality. A measurement or an incident that justifies a
   decision keeps its numbers and its date (python-style, "Written for a person"); generality
