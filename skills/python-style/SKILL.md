@@ -1,12 +1,12 @@
 ---
 name: python-style
-description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md, a decision log) so it is still true months later, and how to keep a roadmap the plan as it stands. Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
+description: The Python style guide for every project, plus the rule for design documents. Covers naming over narration, what a comment may say, docstrings, logging, interfaces versus internals (including hardware behind a boundary), errors, tests, tooling (one gate script, lint ratchets, noqa reasons), how to write a design document (DESIGN.md: the decisions as evidence under the mechanisms they shaped, with diagrams) so it is still true months later and can be read whole, how to keep a roadmap the plan as it stands, and how to write any project document for a person (one question per document, shape first, one home per fact, examples kept true by tests, a glossary, measured budgets, a cold read). Use before writing or reviewing Python in any project, before code that talks to hardware, and before writing or editing a README, design document or roadmap in any project. A project's docs/STYLE.md links here; never copy the guide into a project.
 ---
 
 # Python Style Guide
 
 Conventions for writing and reviewing Python in this project. Ruff and mypy enforce the
-mechanical parts; this document covers the judgement they cannot.
+mechanical parts; this document covers the judgment they cannot.
 
 The guiding idea: **the code should say what it does, and comments should say what the code
 cannot.** Most style debates resolve once you ask which of those two a line is doing.
@@ -45,12 +45,12 @@ find yourself writing `# --- validation ---`, that block is a function.
 
 ## Comments
 
-Comments describe **current behaviour**, not the reasoning that produced it. Keep them short.
+Comments describe **current behavior**, not the reasoning that produced it. Keep them short.
 Assume the reader is busy, competent, and already looking at the code.
 
 Write one when the code cannot state the fact itself:
 
-- surprising behaviour of a third-party call
+- surprising behavior of a third-party call
 - a constraint the code must respect
 - a non-obvious consequence a caller needs to know
 
@@ -105,6 +105,32 @@ Then the rules that follow from that:
 The test is the same one as for comments, one level up: would the sentence still be true and
 still be useful if the reader had no idea when it was written?
 
+An entry is one decision; a project makes a hundred, and the order they were made in is the
+worst order to read them in. The document's shape:
+
+- **Sections are mechanisms, in the order the data flows.** Each is one thing the system does
+  and opens with how that works today: a paragraph a stranger could draw the mechanism from,
+  and a picture where there is a flow, a state machine or more than one thread. The entries
+  follow as the evidence under it.
+- **A principle is stated once**, where it governs; an entry that applies it says so in a
+  clause. The same reason written under five entries reads as five facts and drifts as five.
+- **An entry holds a measurement or a failure.** A decision whose whole reason fits in a
+  sentence is a clause in its mechanism's opening, not an entry.
+- **Pictures are text in the document**, Mermaid in a fenced block, so they diff, are reviewed
+  and render where the document is read. Long labels over many steps go top to
+  bottom; a chain of short labels, broken across lines, reads left to right. Either way the
+  page width decides, so render it there. A box or an arrow is a claim about the
+  code, checked like a sentence, and a picture is checked by rendering it and looking, since a
+  diagram that does not parse or cannot be read passes every text check.
+- **Evidence gets a document of its own when it outgrows its summary.** The design document
+  stays the map, readable in minutes: each mechanism's summary, with its picture, ends with a
+  link to its decisions in `docs/design/<domain>.md`. There each decision is a heading carrying
+  its date, under a contents list, so the list reads as a run of dated claims: a tier between a
+  summary and its evidence, and GitHub's outline navigates it.
+- **Reorganize in steps a reviewer can check:** the moves alone first, proved by comparing the
+  paragraphs before and after; then the openings, as pure additions; then the merges, where
+  every deletion stands on its own.
+
 ## Plans
 
 The roadmap is the plan as it stands today: what is decided, what is next, what is open. It is
@@ -120,6 +146,40 @@ the one document allowed a pending state, because an unchecked box *is* the stat
   archive keeps the history under the number, and the roadmap keeps the plan.
 - A to-do list of things only the owner can do follows the same rule: open items only, done
   ones in its archive.
+- **It opens with where things stand**: what is built, what is under way, and what each open
+  item waits on, as the items themselves state it, in a picture where there are chains. A
+  reader should not need the whole file to learn what is next.
+
+## Written for a person
+
+Truth and currency are not enough: a document is read by someone who was not there, often in a
+hurry, and one they cannot follow is as good as missing.
+
+- **Each document answers one question, and says which.** The README: what is this for, and how
+  do I use it. The design document: how does it work, and why. The roadmap: what is next. An
+  agent guide: how do I work here without breaking anything.
+- **The shape first, then depth on demand.** Each document opens with the whole of its subject,
+  readable in five minutes: what it is for, a picture, the main parts. Each part then unfolds a
+  layer at a time; the complexity of the domain sets how deep, not the order things were written
+  in.
+- **One home per fact, where a reader would look for it.** A higher layer may summarize what a
+  deeper one states, as long as it points there. Two full statements in two homes drift apart.
+- **Concrete before abstract.** Show each artifact a reader meets, a file's contents, a row, a
+  log line, as the code writes it, and keep it true with a test that fails when the code moves.
+- **Evidence keeps its size.** A failure or a measurement that justifies a decision keeps its
+  numbers and date: "blocked for 3 h 46 min while the host's own heartbeat stayed green".
+  Generality removes whose setup it was and what happened next, not how big it was.
+- **One word for one thing, defined once**, in a glossary the documents link to. The product's
+  own words win, and spelling is American, the same in prose and in code.
+- **Budgets for the summary tiers, measured rather than guessed.** A README, a design
+  document's map and a roadmap's opening keep sentences averaging no more than about 22 words,
+  prose paragraphs under 150, a list for an enumeration and prose for an argument; a roadmap
+  item, which carries a spec and its done-means, gets 250. The evidence below a summary may run
+  as long as its topic needs, though a paragraph still splits where its argument turns. The
+  doc-audit skill carries the script that measures them.
+- **Read it cold.** A document nobody new has read is untested. After a large change, have
+  someone without the context, a person or an agent started with no memory, read the opening for
+  five minutes and write down what they could not answer; then answer it in the document.
 
 ## Docstrings
 
@@ -199,14 +259,14 @@ need to catch that specific failure, not merely to satisfy a linter.
 
 ## Tests
 
-**Assert something that would fail if the behaviour were deleted.** A test asserting only that a
+**Assert something that would fail if the behavior were deleted.** A test asserting only that a
 call did not raise usually passes forever, including after the feature is removed. Check the
 output, the state, or the side effect.
 
 **Mutation-check a regression test once.** Reintroduce the bug and confirm the test fails. A
 regression test that never failed has not been shown to work.
 
-**Fakes honour the real contract.** When production code starts calling a new method, the fake
+**Fakes honor the real contract.** When production code starts calling a new method, the fake
 grows it too. A fake that has silently diverged tests a shape that does not exist — and the
 symptom is often an exception inside a worker thread rather than a clean failure.
 
@@ -230,7 +290,7 @@ request context and take what you need from the generator directly.
 a desk size, read the screenshots, and only then call the change done.
 
 **Prove a comment-only change with the AST.** Parse each file before and after, strip the
-docstrings, and compare `ast.dump`. Equal dumps mean no behaviour changed.
+docstrings, and compare `ast.dump`. Equal dumps mean no behavior changed.
 
 ## Tooling
 
@@ -253,7 +313,7 @@ must be extracted rather than absorbed. Raise it deliberately, never to silence 
 
 **Exempt tests where the rule does not fit.** In test code the literals often *are* the expected
 values, `assert` is the mechanism, and fixtures are unused by design. Exempting those is honest;
-it is not licence to leave every literal bare, because a number that is a *threshold* rather than
+it is not license to leave every literal bare, because a number that is a *threshold* rather than
 an expected value still wants a name.
 
 **Every `noqa` carries its reason.** A bare code records only that someone silenced it.

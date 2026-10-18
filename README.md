@@ -12,11 +12,12 @@ Three skills, loaded when the work calls for them:
   else's thread, files that must survive a crash, network filesystems, services under systemd,
   uv with apt-only packages, and what may go in a public repository. Each names the failure it
   prevents; each was paid for once.
-- **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to
-  the code and the machine, current (plans are the plan as it stands, history archived), each
-  fact in one place, nothing private, nothing tied to one installation or one person's settings.
-  It carries `check_private.sh`, the privacy check every public project copies into `scripts/`
-  unchanged; a project adds its own terms with `scripts/private_terms.sh`.
+- **doc-audit** — a periodic hard look at every document in a project, tracked or not: true to the
+  code and the machine, current (plans are the plan as it stands, history archived), each fact in
+  one place, shaped so a stranger could draw the system from it, readable in measured budgets,
+  nothing private, nothing tied to one installation or one person's settings. It carries
+  `check_private.sh`, the privacy check every public project copies into `scripts/` unchanged; a
+  project adds its own terms with `scripts/private_terms.sh`.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the
@@ -69,6 +70,6 @@ claude plugin update conventions@conventions
 A skill's `description` is the only thing Claude reads before deciding whether to load it, so it
 is written for that decision and nothing else. First what the skill covers, in the words a task
 would use: the things being written, the libraries, the file types. Then `Use when`, naming the
-situations. Then, where a near miss is likely, what it does not cover. It does not summarise the
+situations. Then, where a near miss is likely, what it does not cover. It does not summarize the
 body, and it stays under 1024 characters, the limit Claude Code enforces. The three skills here
 are the pattern; a description that reads well but names no situation will not load.

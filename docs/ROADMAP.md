@@ -100,7 +100,7 @@ result.
   - one triggering case per skill, for example a threaded consumer for python-traps or a new
     design-document entry for docs-style;
   - one negative case, a JavaScript task that loads no Python skill;
-  - one behaviour case per skill, for example a narrated `if` gets a name, or a `yield` under a
+  - one behavior case per skill, for example a narrated `if` gets a name, or a `yield` under a
     lock is refused. For doc-audit, a README that names a flag the code has removed: the
     audit's report lists it under Fixed. Today the audit is a procedure in prose and nothing
     shows it finds a stale fact when one is planted.
@@ -233,7 +233,7 @@ not name them. A rule a linter enforces needs no agent to remember it.
   not only where it is.
 
 **Done means:** every rule in both skills is marked either with the linter that enforces it or as
-judgement. A project seeded by `init` fails its gate on `log.info(f"...")`.
+judgment. A project seeded by `init` fails its gate on `log.info(f"...")`.
 
 ## 13. CI and release hygiene
 
@@ -277,12 +277,12 @@ that could run it also runs an agent.
 - [ ] Choose the home. The leading option is a private repository, `conventions-holdout`, that no
   agent credential can read. Its own workflow checks out this plugin, or a project, at a given
   commit, runs the scenarios, and reports pass or fail per scenario name, never the scenario text,
-  so a failure says which behaviour broke without teaching the fix. A deny rule or a gitignored
+  so a failure says which behavior broke without teaching the fix. A deny rule or a gitignored
   directory on the same machine is the weaker option: the agent runs shell commands, and one
   machine holds both.
 - [ ] Decide how scenarios get in: written by a person, and never copied from the public suite,
   which the agent has seen. The first is a stale-fact case of the same kind as doc-audit's
-  behaviour case in §5, with a different seed.
+  behavior case in §5, with a different seed.
 - [ ] Run it on demand and before a release (§13), not on every push; it costs tokens and
   credentials.
 
