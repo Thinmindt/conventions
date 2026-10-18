@@ -17,4 +17,5 @@ files '*.sh' | xargs -0 "${shellcheck[@]}"
 files | xargs -0 "${codespell[@]}"
 bash scripts/check_examples.sh
 bash scripts/test_scripts.sh
+python3 -B scripts/test_readability.py
 echo "all checks passed"

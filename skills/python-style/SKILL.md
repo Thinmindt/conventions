@@ -177,6 +177,15 @@ hurry, and one they cannot follow is as good as missing.
   item, which carries a spec and its done-means, gets 250. The evidence below a summary may run
   as long as its topic needs, though a paragraph still splits where its argument turns. The
   doc-audit skill carries the script that measures them.
+- **The register follows the tier.** The top of a README speaks to the person with the problem,
+  in their words: "your cat", what the system does for them before how it does it, a principle
+  with one reason, and no figure in the prose, since a figure's home is a settings table or the
+  evidence, where a test pins it. An aside that matters is a sentence; one that does not is cut.
+  The vocabulary is the subject's own, used without apology: the reader is assumed capable. A
+  procedure below that, an install or a calibration, is one claim a sentence, with a reason only
+  where the sentence collapses without it. The evidence, and a guide for agents, are written to
+  be checked: every claim pinned, every edge case named. Who reads a paragraph sets its register,
+  not who wrote it.
 - **Read it cold.** A document nobody new has read is untested. After a large change, have
   someone without the context, a person or an agent started with no memory, read the opening for
   five minutes and write down what they could not answer; then answer it in the document.
