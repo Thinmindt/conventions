@@ -1,6 +1,6 @@
 #!/bin/bash
-# Exercises doc-audit.sh, the check_private.sh template and check_examples.sh in throwaway
-# directories.
+# Exercises doc-audit.sh, build-item.sh, the check_private.sh template and check_examples.sh in
+# throwaway directories.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
@@ -30,6 +30,36 @@ stamp=$(find "$XDG_STATE_HOME" -type f)
 echo "$(($(date +%s) - 40 * 86400)) 2000-01-01" >"$stamp"
 expect "doc-audit: 40 days old, reminder" yes "$(bash "$audit" check | grep -q '40 days ago' && echo yes)"
 unset CLAUDE_PROJECT_DIR
+
+# build-item.sh locate: needs a workbench path, finds an item by id, refuses one that is not
+# ToDo or In progress. gates: runs scripts/check.sh, fails when there is nothing to run.
+build=$root/skills/build-item/build-item.sh
+wb=$work/workbench
+mkdir -p "$wb/projects/bird-counter/items" "$work/config"
+printf -- '---\nid: bird-counter-7\nproject: bird-counter\nstate: ToDo\n---\n# Count birds\n' >"$wb/projects/bird-counter/items/bird-counter-7.md"
+printf -- '---\nid: bird-counter-8\nstate: Done\n---\n' >"$wb/projects/bird-counter/items/bird-counter-8.md"
+locate() { env -u WORKBENCH XDG_CONFIG_HOME="$work/config" "$@" bash "$build" locate "${id:-bird-counter-7}" 2>&1 || true; }
+expect "build-item: no workbench configured" yes \
+    "$(locate | grep -q 'no workbench configured' && echo yes)"
+expect "build-item: WORKBENCH set, item found" "item=$wb/projects/bird-counter/items/bird-counter-7.md" \
+    "$(locate WORKBENCH="$wb" | head -n1)"
+expect "build-item: state printed" "state=ToDo" "$(locate WORKBENCH="$wb" | sed -n 2p)"
+mkdir -p "$work/config/conventions"
+printf '%s\n' "$wb" >"$work/config/conventions/workbench"
+expect "build-item: path from the config file" "lessons=$wb/review-lessons.md" \
+    "$(locate | sed -n 4p)"
+expect "build-item: a Done item is refused" yes \
+    "$(id=bird-counter-8 locate | grep -q 'is Done, not ToDo' && echo yes)"
+expect "build-item: a missing item is refused" yes \
+    "$(id=bird-counter-9 locate | grep -q 'no item bird-counter-9' && echo yes)"
+gated=$work/gated
+mkdir -p "$gated/scripts"
+gates() { (cd "$gated" && bash "$build" gates >/dev/null 2>&1 && echo pass || echo fail); }
+expect "build-item: no gate found" fail "$(gates)"
+printf '#!/bin/bash\nexit 0\n' >"$gated/scripts/check.sh"
+expect "build-item: check.sh passes" pass "$(gates)"
+printf '#!/bin/bash\nexit 1\n' >"$gated/scripts/check.sh"
+expect "build-item: check.sh fails" fail "$(gates)"
 
 # check_private.sh: passes with no terms, fails on a term in a file or an unpushed commit.
 repo=$work/repo

@@ -1,7 +1,7 @@
 # conventions
 
 A Claude Code plugin carrying how code is written in every project, whatever machine it runs on.
-Three skills, loaded when the work calls for them:
+Three skills loaded when the work calls for them, and one the owner invokes:
 
 - **python-style** — the Python style guide: naming over narration, what a comment may say,
   docstrings, logging, interfaces versus internals (hardware behind a boundary), errors, tests,
@@ -19,6 +19,14 @@ Three skills, loaded when the work calls for them:
   `check_private.sh`, the privacy check every public project copies into `scripts/` unchanged; a
   project adds its own terms with `scripts/private_terms.sh`.
 
+- **build-item** — `/build-item <item-id>`, the owner's side of the loop with their Project
+  Manager agent: it reads one agreed work item from the Project Manager's workbench, builds it to
+  its acceptance criteria on a branch named for it in the current checkout, runs the repository's
+  gates, hands the diff to `agents/item-reviewer.md`, a fresh read-only reviewer that returns a
+  verdict in a fixed shape, loops on a fail at most three times, and ends with a build report.
+  It never pushes, opens a pull request or writes to the workbench. The workbench path lives in
+  `WORKBENCH` or `${XDG_CONFIG_HOME:-~/.config}/conventions/workbench`, outside every project.
+
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the
 last audit is kept per project under `${XDG_STATE_HOME:-~/.local/state}/conventions/doc-audit/`,
@@ -35,8 +43,8 @@ of that date.
 `scripts/check.sh` runs every gate, locally and in CI: the privacy check (and that its copy still
 matches the template), the JSON files parse, shellcheck, codespell, `scripts/check_examples.sh`,
 which parses every `python` example in the skills and runs ruff over them with the rules the guide
-itself states, and `scripts/test_scripts.sh`, which exercises the scripts in throwaway directories.
-It needs `uv`; the tools run through `uvx` at pinned versions.
+itself states, and `scripts/test_scripts.sh`, which exercises the scripts, `build-item.sh`
+included, in throwaway directories. It needs `uv`; the tools run through `uvx` at pinned versions.
 
 ## Installing
 
