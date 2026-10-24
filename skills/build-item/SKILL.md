@@ -1,6 +1,6 @@
 ---
 name: build-item
-description: Build one agreed work item from the owner's Project Manager workbench, in the current checkout. Covers locating the item by its id, building to its acceptance criteria on a branch named for it, running the repository's gates, handing the diff to a fresh read-only reviewer with the criteria and the review lessons, looping on a fail at most three times, and ending with a build report in a fixed shape. Use only when the owner runs /build-item with an item id. Not for a change that has no item, not on a schedule, and never started from another skill.
+description: Build one agreed work item from the owner's Project Manager workbench, in the current checkout. Covers locating the item by its id, building to its acceptance criteria on a branch named for it, running the repository's gates, handing the diff to a fresh read-only reviewer with the criteria and the review lessons, looping on a fail at most three times, and ending with a build report in a fixed shape, written to a dated file the Project Manager reads. Use only when the owner runs /build-item with an item id. Not for a change that has no item, not on a schedule, and never started from another skill.
 disable-model-invocation: true
 argument-hint: <item-id>
 ---
@@ -10,7 +10,8 @@ argument-hint: <item-id>
 The Project Manager agent keeps a workbench of projects and work items; each item carries
 acceptance criteria the owner has agreed. This skill is the owner's side of that loop: in the
 owner's own session, in the checkout of the project the item names, it builds one item to its
-criteria, has a fresh reviewer judge the diff, and stops. It never pushes, never opens a pull
+criteria, has a fresh reviewer judge the diff, writes its report to a file the Project Manager
+reads, and stops. It never pushes, never opens a pull
 request, never writes to the workbench, and never builds two items. The owner reviews the branch,
 pushes, opens the pull request and merges; the merge is the deploy, the way the workbench's
 `projects.md` says for that project.
@@ -91,10 +92,13 @@ and the owner may pin a stronger one there. A verdict is short and should be str
 
 ## Report
 
-The session ends with this block, which the owner pastes into the item's thread, where the
-Project Manager reads it:
+The session ends with this block, however it ended: a pass, a third fail, or a stop before the
+build was done, such as criteria that could not be met or another item's branch in the way. Only
+a refusal from `locate` ends without one, since no item was opened. The block is the session's
+last message, and it is written to a file, fed on stdin (a heredoc will do):
 
 ```
+bash ${CLAUDE_SKILL_DIR}/build-item.sh report <item-id> <<'REPORT'
 Build report, <item-id>
 Branch: item/<item-id> at <short sha>, <n> commits on <default branch>
 Rounds: <n> of 3; verdict: pass | fail
@@ -106,7 +110,24 @@ Lessons: kept | broken: <rule>
 Out of scope, seen: <one line each, or none>
 Documents: <which the item's definition of done named, updated | not updated: why>
 Next: review the branch, push, open the pull request | stopped: <reason>
+REPORT
 ```
+
+The file replaces the pasted report: the script writes `<exports>/builds/<timestamp>-<item-id>.md`
+and prints the path, and the Project Manager reads it from there, so the owner no longer pastes
+the block into the item's thread. The exports folder is wherever the owner mounts it; the script
+reads its path from `EXPORTS` or from the one line of
+`${XDG_CONFIG_HOME:-~/.config}/conventions/exports`, a file of its own beside the workbench's,
+never a second line in it. The exports folder is not the workbench, so nothing here writes to
+the workbench. The script never overwrites: a resumed item leaves two files, and the later one is
+the current report. It refuses an item id with `/` or `..` in it, and a block that is missing
+one of its fields, so a file in the folder is always a whole report. With no exports path
+configured, or a folder that is not there, it prints the block and exits non-zero; the owner
+then pastes the block into the item's thread, the way it went before the file.
+
+The fields are the branch, the sha, the commit count, the rounds, the criteria, the gates, the
+lessons, what was seen out of scope, and the documents. There is no pull request number: the
+builder never opens one, and the Project Manager watches for the pull request itself.
 
 Nothing is pushed and the workbench is untouched. The owner reviews locally, pushes, opens the
 pull request, and merges; the Project Manager sees the branch and the merge and moves the item.
