@@ -7,14 +7,16 @@
 # ${XDG_CONFIG_HOME:-~/.config}/conventions/workbench.
 set -euo pipefail
 
-workbench() {
-    local config=${XDG_CONFIG_HOME:-$HOME/.config}/conventions/workbench
-    if [ -n "${WORKBENCH:-}" ]; then
-        printf '%s\n' "$WORKBENCH"
+# A path the owner configures outside every project: the variable named by $2, or the one line
+# of ${XDG_CONFIG_HOME:-~/.config}/conventions/$1. Each path has its own file.
+configured() {
+    local name=$1 var=$2 config=${XDG_CONFIG_HOME:-$HOME/.config}/conventions/$1
+    if [ -n "${!var:-}" ]; then
+        printf '%s\n' "${!var}"
     elif [ -f "$config" ]; then
         head -n1 "$config"
     else
-        echo "no workbench configured: set WORKBENCH, or write its path as the one line of $config" >&2
+        echo "no $name configured: set $var, or write its path as the one line of $config" >&2
         exit 2
     fi
 }
@@ -32,7 +34,7 @@ case ${1:-} in
 locate)
     id=${2:-}
     [ -n "$id" ] || { echo "usage: build-item.sh locate <item-id>" >&2; exit 2; }
-    wb=$(workbench)
+    wb=$(configured workbench WORKBENCH)
     [ -d "$wb" ] || { echo "workbench not found at $wb" >&2; exit 2; }
     project=${id%-*}
     item=$wb/projects/$project/items/$id.md
