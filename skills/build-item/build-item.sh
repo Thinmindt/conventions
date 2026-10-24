@@ -124,7 +124,8 @@ report)
         printf '%s\n' "$block"
         exit 2
     fi
-    mkdir -p "$exports/builds"
+    # Not mkdir -p: on a UNC path like //host/share/exports it tries to create //host and fails.
+    [ -d "$exports/builds" ] || mkdir "$exports/builds"
     file=$exports/builds/$(stamp)-$id.md
     # noclobber makes the write fail instead of replacing a file that is already there.
     if ! (set -C && printf '%s\n' "$block" >"$file") 2>/dev/null; then
