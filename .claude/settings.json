@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash scripts/check.sh)"
+      "Bash(bash scripts/check.sh)",
+      "Bash(bash scripts/check_private.sh)",
+      "Bash(bash scripts/check_examples.sh *)",
+      "Bash(bash scripts/test_scripts.sh)",
+      "Bash(bash skills/build-item/build-item.sh *)",
+      "Bash(bash skills/doc-audit/doc-audit.sh *)",
+      "Bash(python3 skills/doc-audit/readability.py *)"
     ]
   }
 }

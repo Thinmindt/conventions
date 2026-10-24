@@ -3,6 +3,7 @@ name: build-item
 description: Build one agreed work item from the owner's Project Manager workbench, in the current checkout. Covers locating the item by its id, building to its acceptance criteria on a branch named for it, running the repository's gates, handing the diff to a fresh read-only reviewer with the criteria and the review lessons, looping on a fail at most three times, and ending with a build report in a fixed shape, written to a dated file the Project Manager reads. Use only when the owner runs /build-item with an item id. Not for a change that has no item, not on a schedule, and never started from another skill.
 disable-model-invocation: true
 argument-hint: <item-id>
+allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/build-item.sh *)
 ---
 
 # Build an item
