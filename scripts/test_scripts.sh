@@ -61,6 +61,55 @@ expect "build-item: check.sh passes" pass "$(gates)"
 printf '#!/bin/bash\nexit 1\n' >"$gated/scripts/check.sh"
 expect "build-item: check.sh fails" fail "$(gates)"
 
+# build-item.sh report: writes the block on stdin to <exports>/builds/<timestamp>-<id>.md and
+# never overwrites; refuses a path-shaped id or a block missing a field; with no exports path it
+# prints the block and fails. SOURCE_DATE_EPOCH fixes the timestamp.
+exports=$work/exports
+mkdir -p "$exports"
+block="Build report, bird-counter-7
+Branch: item/bird-counter-7 at abc1234, 2 commits on main
+Rounds: 1 of 3; verdict: pass
+Criteria:
+1. met — the count is printed
+Gates: bash scripts/check.sh pass
+Lessons: kept
+Out of scope, seen: none
+Documents: none named
+Next: review the branch, push, open the pull request"
+report_exit() {
+    printf '%s\n' "$block" |
+        env -u EXPORTS XDG_CONFIG_HOME="$work/config" SOURCE_DATE_EPOCH=1000000000 "$@" \
+            bash "$build" report "${id:-bird-counter-7}" 2>&1
+}
+report() { report_exit "$@" || true; }
+written() { find "$exports/builds" -type f 2>/dev/null | wc -l | tr -d ' '; }
+expect "report: no exports configured, prints the block" yes \
+    "$(report | grep -q '^Build report, bird-counter-7' && echo yes)"
+expect "report: no exports configured, fails" fail "$(report_exit >/dev/null && echo pass || echo fail)"
+expect "report: nothing written without an exports path" 0 "$(written)"
+first=$exports/builds/2001-09-09T014640Z-bird-counter-7.md
+expect "report: EXPORTS set, file named by timestamp and id" "report=$first" "$(report EXPORTS="$exports")"
+expect "report: the file holds the block" yes "$(printf '%s\n' "$block" | cmp -s - "$first" && echo yes)"
+expect "report: a second write at the same time is refused" yes \
+    "$(report EXPORTS="$exports" | grep -q 'exists already; nothing overwritten' && echo yes)"
+expect "report: nothing overwritten, still one file" 1 "$(written)"
+expect "report: a later write leaves two files" "report=$exports/builds/2001-09-09T014641Z-bird-counter-7.md" \
+    "$(report EXPORTS="$exports" SOURCE_DATE_EPOCH=1000000001)"
+expect "report: two files" 2 "$(written)"
+printf '%s\n' "$exports" >"$work/config/conventions/exports"
+expect "report: path from its own config file" "report=$exports/builds/2001-09-09T014642Z-bird-counter-7.md" \
+    "$(report SOURCE_DATE_EPOCH=1000000002)"
+expect "report: an id with / is refused" yes "$(id=projects/bird-counter-7 report | grep -q 'refused item id' && echo yes)"
+expect "report: an id with .. is refused" yes "$(id=../bird-counter-7 report | grep -q 'refused item id' && echo yes)"
+expect "report: a block for another item is refused" yes \
+    "$(id=bird-counter-8 report | grep -q 'no line starts with Build report, bird-counter-8' && echo yes)"
+expect "report: a missing exports folder prints the block" yes \
+    "$(report EXPORTS="$work/absent" | grep -q '^Next: review the branch' && echo yes)"
+block=$(printf '%s\n' "$block" | grep -v '^Gates:')
+expect "report: a block missing a field is refused" yes \
+    "$(report SOURCE_DATE_EPOCH=1000000003 | grep -q 'no line starts with Gates:' && echo yes)"
+expect "report: still three files" 3 "$(written)"
+
 # check_private.sh: passes with no terms, fails on a term in a file or an unpushed commit.
 repo=$work/repo
 mkdir -p "$repo/scripts"

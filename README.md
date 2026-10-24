@@ -23,9 +23,11 @@ Three skills loaded when the work calls for them, and one the owner invokes:
   Manager agent: it reads one agreed work item from the Project Manager's workbench, builds it to
   its acceptance criteria on a branch named for it in the current checkout, runs the repository's
   gates, hands the diff to `agents/item-reviewer.md`, a fresh read-only reviewer that returns a
-  verdict in a fixed shape, loops on a fail at most three times, and ends with a build report.
-  It never pushes, opens a pull request or writes to the workbench. The workbench path lives in
-  `WORKBENCH` or `${XDG_CONFIG_HOME:-~/.config}/conventions/workbench`, outside every project.
+  verdict in a fixed shape, loops on a fail at most three times, and ends with a build report
+  written to a dated file in the exports folder the Project Manager reads. It never pushes, opens
+  a pull request or writes to the workbench. The workbench and exports paths live in `WORKBENCH`
+  and `EXPORTS`, or in `${XDG_CONFIG_HOME:-~/.config}/conventions/workbench` and
+  `.../conventions/exports`, one file each, outside every project.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the
