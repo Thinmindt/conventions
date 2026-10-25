@@ -1,6 +1,7 @@
 ---
 name: doc-audit
 description: A hard look at every document in a project — tracked docs, local notes, to-do lists, agent memory and the install instructions of companion repos — so that each is true to the code and the machine, current (plans are the plan as it stands, history archived), stated once in the place it is most useful, shaped so a stranger could draw the system from it, readable by a person in a hurry, safe to publish, and free of one installation's or one person's settings. Use when the session-start reminder says an audit is due, or when asked. During other work, when you notice a document that contradicts the code or the machine, a plan that is no longer the plan, a fact stated in two places, a design document whose entries read in the order they were written, or a private or installation-specific detail in a tracked file, say so and offer this audit; do not start it unasked.
+allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/doc-audit.sh *), Bash(python3 ${CLAUDE_SKILL_DIR}/readability.py *)
 ---
 
 # Documentation audit
