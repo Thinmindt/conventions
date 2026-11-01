@@ -1,7 +1,7 @@
 # conventions
 
 A Claude Code plugin carrying how code is written in every project, whatever machine it runs on.
-Three skills, loaded when the work calls for them:
+Four skills, loaded when the work calls for them:
 
 - **python-style** — the Python style guide: naming over narration, what a comment may say,
   docstrings, logging, interfaces versus internals (hardware behind a boundary), errors, tests,
@@ -20,6 +20,11 @@ Three skills, loaded when the work calls for them:
   project adds its own terms with `scripts/private_terms.sh`. Beside it, `readability.py`
   measures prose against the budgets, and `render.py` screenshots a Markdown file as GitHub
   shows it, diagrams included.
+- **retro** — a retrospective when a session wraps up: what fell short and why it got through,
+  what worked, what cost time, turned into proposed changes, each put where it will be enforced
+  (a gate, a test, the agent guide, python-traps or python-style, or agent memory). Claude offers
+  it at the end of a session or after a review finds what the gates missed; the owner picks what
+  is applied.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the

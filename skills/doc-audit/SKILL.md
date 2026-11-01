@@ -204,6 +204,11 @@ bash ${CLAUDE_SKILL_DIR}/doc-audit.sh mark
 
 ## Between audits
 
+A branch that changes documents gets this audit's checks, scoped to the documents it touches,
+before it goes to the owner, the way a branch that changes code gets a code review. A document
+change does not get a code review, and a code change does not skip one because it also edits a
+document.
+
 The reminder at session start comes when the last recorded audit is more than 30 days old
 (`DOC_AUDIT_DAYS` changes that). Between audits, drift you notice while working is fixed if it is
 in a file you are already changing and mentioned otherwise, with an offer to run this audit.
