@@ -44,12 +44,17 @@ here writes to it.
 
 ## Start the branch
 
-Work on `item/<item-id>`, cut from the project's default branch, in the current checkout. One
-item is in progress at a time: if another `item/*` branch holds commits the default branch does
-not, say which and stop; the owner decides what happens to it. If `item/<item-id>` already exists,
-continue on it: a session that ended early is resumed, not restarted.
+Work on `item/<item-id>`, or on the pattern the project's guide or the owner names instead, such
+as `feature/<name>`, cut from the project's default branch, in the current checkout. One item is
+in progress at a time: if another branch of that pattern holds commits the default branch does
+not, say which and stop; the owner decides what happens to it. If the item's branch already
+exists, continue on it: a session that ended early is resumed, not restarted.
 
 ## Build
+
+When a criterion is about runtime state (the environment, config, what a live system sets), take
+a read-only look at that state before designing for it. If the session cannot take that look, ask
+the owner for it early instead of designing around the gap.
 
 Build to the criteria and inside the scope. A criterion is a behavior; the build makes it true and
 shows it true, with a test where the project has tests. A bug fix starts with the regression test
@@ -73,23 +78,40 @@ Runs the repository's own gates that it finds: `scripts/check.sh`, then `npm run
 run by hand. A failing gate is fixed before any review; the gate's output, pass or fail, is
 quoted in the report and handed to the reviewer as given.
 
+## Cut
+
+Cut the code to the simplest implementation; legibility is critical. Remove every check, guard,
+list entry and test assertion that no criterion and nothing actually observed needs. A test
+asserts its criterion's behavior once, with no cases that share one code path. After the cut, run
+the gates again.
+
 ## Review
 
 Hand the work to the `item-reviewer` agent, which runs in a fresh context with read-only tools and
 no memory of the build's reasoning. Its prompt carries, verbatim: the item's criteria, scope and
-definition of done; the rows of `review-lessons.md`; the gates' output; the base commit; and the
-diff, `git diff <base>...HEAD`. It returns a verdict in a fixed shape (see
+definition of done; the rows of `review-lessons.md`; the gates' output; what the build observed
+of runtime state; the pull request body, when there is one; the base commit; and the diff,
+`git diff <base>...HEAD`. It returns a verdict in a fixed shape (see
 [../../agents/item-reviewer.md](../../agents/item-reviewer.md)): pass or fail, each criterion met
-or not with where it looked, each lesson kept or broken, a numbered blocking list.
+or not with where it looked, simplicity kept or broken, each lesson kept or broken, a numbered
+blocking list.
 
-A round is one build, its gates and one review. On a fail, fix only what the blocking list names,
-run the gates again, and review again. Three reviews at most. After the third fail, stop: no more
-edits, and the report says what the reviewer could not accept and why the build could not
-satisfy it. The owner reads that and decides, which is why the limit exists: a loop that keeps
-going past three rounds is building something the criteria do not describe.
+A round is one build, its gates, the cut and one review. On a fail, fix only what the blocking list
+names, run the gates and the cut again, and review again. Three reviews at most. After the third
+fail, stop: no more edits, and the report says what the reviewer could not accept and why the build
+could not satisfy it. The owner reads that and decides, which is why the limit exists: a loop that
+keeps going past three rounds is building something the criteria do not describe.
 
 The reviewer's model is set in `agents/item-reviewer.md`; it inherits the session's by default,
 and the owner may pin a stronger one there. A verdict is short and should be strict.
+
+## Pull request body
+
+The build still opens no pull request. When the project's agent guide names a place where pull
+request bodies are written before the pull request, the build writes the body there, following the
+repository's pull request template, with the gates' run as command → result; the reviewer reads it
+with the diff, and the report's Next line points to it. After the last round it is written fresh,
+not patched, for a reader with 60 seconds: one fact per bullet, each fact once, no build history.
 
 ## Report
 
@@ -101,7 +123,7 @@ last message, and it is written to a file, fed on stdin (a heredoc will do):
 ```
 bash ${CLAUDE_SKILL_DIR}/build-item.sh report <item-id> <<'REPORT'
 Build report, <item-id>
-Branch: item/<item-id> at <short sha>, <n> commits on <default branch>
+Branch: <branch> at <short sha>, <n> commits on <default branch>
 Rounds: <n> of 3; verdict: pass | fail
 Criteria:
 1. met | not met — <one line>
@@ -110,7 +132,7 @@ Gates: <command> pass | fail; <command> pass | fail
 Lessons: kept | broken: <rule>
 Out of scope, seen: <one line each, or none>
 Documents: <which the item's definition of done named, updated | not updated: why>
-Next: review the branch, push, open the pull request | stopped: <reason>
+Next: review the branch, push, open the pull request (body: <path>) | stopped: <reason>
 REPORT
 ```
 
