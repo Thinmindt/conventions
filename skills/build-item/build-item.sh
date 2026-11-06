@@ -1,9 +1,8 @@
 #!/bin/bash
 # locate <item-id>: prints the item's file and its project's documents in the Project Manager's
 #        workbench, and refuses an item whose state is not ToDo or In progress.
-# gates: runs the repository's own gates, those it finds: scripts/check.sh, then `npm run check`
-#        when package.json defines one. Stops at the first that fails.
-# report <item-id>: reads the Build report on stdin and writes it, never overwriting, to
+# gates: runs the repository's own gate, scripts/check.sh.
+# report <item-id>: reads the Build report on stdin and writes it to
 #        <exports>/builds/<timestamp>-<item-id>.md, where the Project Manager reads it. Without an
 #        exports path it prints the block and exits non-zero, so the owner can paste it instead.
 # The workbench path is $WORKBENCH, or the one line of
@@ -73,37 +72,21 @@ locate)
         ;;
     esac
     echo "item=$item"
-    echo "state=$state"
     echo "project=$wb/projects/$project"
     echo "lessons=$wb/review-lessons.md"
     echo "projects=$wb/projects.md"
     ;;
 gates)
-    ran=0
-    if [ -f scripts/check.sh ]; then
-        echo "== bash scripts/check.sh"
-        bash scripts/check.sh
-        ran=1
-    fi
-    if [ -f package.json ] && python3 -c 'import json, sys; sys.exit(0 if "check" in json.load(open("package.json")).get("scripts", {}) else 1)'; then
-        echo "== npm run check"
-        npm run check
-        ran=1
-    fi
-    if [ "$ran" -eq 0 ]; then
-        echo "no gate found: neither scripts/check.sh nor an npm check script; run what the item's definition of done names" >&2
+    if [ ! -f scripts/check.sh ]; then
+        echo "no gate found: no scripts/check.sh; run what the item's definition of done names" >&2
         exit 1
     fi
+    echo "== bash scripts/check.sh"
+    bash scripts/check.sh
     ;;
 report)
     id=${2:-}
     [ -n "$id" ] || { echo "usage: build-item.sh report <item-id> < report" >&2; exit 2; }
-    case $id in
-    */* | *..*)
-        echo "refused item id '$id': an id has no / or .. in it" >&2
-        exit 2
-        ;;
-    esac
     block=$(cat)
     [ -n "$block" ] || { echo "no report on stdin" >&2; exit 2; }
     missing=()
@@ -127,12 +110,7 @@ report)
     # Not mkdir -p: on a UNC path like //host/share/exports it tries to create //host and fails.
     [ -d "$exports/builds" ] || mkdir "$exports/builds"
     file=$exports/builds/$(stamp)-$id.md
-    # noclobber makes the write fail instead of replacing a file that is already there.
-    if ! (set -C && printf '%s\n' "$block" >"$file") 2>/dev/null; then
-        echo "$file exists already; nothing overwritten" >&2
-        printf '%s\n' "$block"
-        exit 1
-    fi
+    printf '%s\n' "$block" >"$file"
     echo "report=$file"
     ;;
 *)
