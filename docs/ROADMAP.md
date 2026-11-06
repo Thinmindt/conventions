@@ -137,8 +137,7 @@ that has the new entry in the chosen file and passes `scripts/check.sh`.
 ## 7. Set up a project, and check it for drift
 
 A project takes one copied file from this plugin, `check_private.sh`, and writing it, the gate
-skeleton and the CI workflow is manual. (`docs/STYLE.md` used to be a copy too; it is now one
-line linking to the guide, so it cannot drift.)
+skeleton and the CI workflow is manual.
 
 - [ ] A plugin executable, `bin/conventions-project`.
   - `init` writes the files a project takes from this plugin: the one-line `docs/STYLE.md`,

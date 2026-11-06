@@ -5,7 +5,7 @@ description: The Python style guide for every project, plus the rule for design 
 
 # Python Style Guide
 
-Conventions for writing and reviewing Python in this project. Ruff and mypy enforce the
+Conventions for writing and reviewing Python in every project. Ruff and mypy enforce the
 mechanical parts; this document covers the judgment they cannot.
 
 The guiding idea: **the code should say what it does, and comments should say what the code
