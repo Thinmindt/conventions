@@ -95,9 +95,7 @@ ignore further SIGTERMs so a second one cannot interrupt the cleanup.
 will not open, a device that is busy — bring up the rest with a warning. The web page that
 still comes up is often how you find out something is wrong.
 
-**`print()` is block-buffered under a service manager.** Lines are lost when the process is
-killed. Use `logging`; set the root at `WARNING` and raise only your own loggers to `INFO`, or
-a chatty dependency buries your output.
+**`print()` is block-buffered under a service manager.** See python-style, "Logging".
 
 **`load_dotenv()` does not override the environment.** `VAR=value python main.py` beats `.env`,
 which is what lets a test run point every path at scratch without editing anything. Per-run
@@ -136,11 +134,8 @@ account name, an absolute home path. A pet's name is a common answer to account-
 questions, and knowing it lends a stranger false familiarity. Commit author lines are as public
 as the files, so a personal address in `git config user.email` publishes itself on every commit.
 
-**Enforce it with a check, not a habit.** Keep the private terms in a gitignored file and have
-the project's gate script fail when one appears in a tracked or about-to-be-added file, or in
-the message or author of a commit no remote has yet (`git log HEAD --not --remotes`). Without the
-file, as on CI, the check passes and says nothing is configured. The doc-audit skill carries the
-script to copy, and how a project adds terms of its own.
+**Enforce it with a check, not a habit.** The project's gate runs `scripts/check_private.sh`;
+the doc-audit skill carries it, says what it checks and how a project adds terms of its own.
 
 **Nothing tracked may depend on one person's settings.** A rule that holds because of how the
 owner configured git, their shell, their paths or their hardware is false for the next
