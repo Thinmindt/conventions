@@ -57,12 +57,8 @@ Where two documents disagree, reality decides, not the newer document.
 
 **Current.**
 
-- A plan document holds only the present plan: what is decided, what is next, what is open.
-  Finished items, the history behind decisions and measurements that fed a decision now made
-  move **verbatim** to an archive beside it, under the same headings or section numbers, with
-  the date they moved. Section numbers never change, so citations in commit messages and other
-  documents keep resolving.
-- A to-do list holds only open items; done ones move to its archive with the note they had.
+- A plan or a to-do list holds only what is open; the rest moves verbatim to its archive, as
+  python-style's "Plans" says.
 - Numbers that decay — counts, free space, versions, "as of" snapshots — are re-measured and
   dated, or replaced by how to measure them.
 - A design document states decisions, never a pending state (see python-style, "Design
@@ -113,10 +109,9 @@ glossary's? After a large change, run a cold read: an agent started with no memo
 reads the opening for five minutes and lists what it could not answer, and each answer goes into
 the document.
 
-**Safe to publish.** Tracked files, commit messages and commit authors are public. Look for
-network addresses, hostnames, share names, tokens, personal email addresses, and people's and
-pets' names; anything private moves to a gitignored file. If it has already been pushed, report
-it; rewriting pushed history is the owner's decision.
+**Safe to publish.** Look for everything python-traps' "A public repository" keeps out of tracked
+files and commits; anything private moves to a gitignored file. If it has already been pushed,
+report it; rewriting pushed history is the owner's decision.
 
 Every public project carries the check that enforces this, `scripts/check_private.sh`, copied
 unchanged from `check_private.sh` in this skill's directory and run first by the project's gate
@@ -136,14 +131,12 @@ If the project's copy has drifted from the template, bring it back and move the 
 **General.** A stranger with different hardware and different settings should be able to follow
 every tracked document. Look for:
 
-- Rules that hold only because of one person's configuration (their git identity, shell, editor,
-  paths, sudo rights). Replace them with a check the repository runs or a requirement stated
-  for every user.
+- Rules that hold only because of one person's settings, and examples with real names
+  (python-traps, "Nothing tracked may depend on one person's settings").
 - Installation-specific values written as if universal (a device model, a count, a network
   service, a screen size). Make them configuration with a documented default, or state them as
   "this installation uses X; Y also works because…", and say which choices would change how
   well the project works.
-- Examples that use real names. Use made-up ones.
 - Evidence cut down in the name of generality. A measurement or an incident that justifies a
   decision keeps its numbers and its date (python-style, "Written for a person"); generality
   removes whose setup it was, not how big it was.
