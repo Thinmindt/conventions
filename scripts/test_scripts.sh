@@ -74,6 +74,10 @@ Gates: bash scripts/check.sh pass
 Lessons: kept
 Out of scope, seen: none
 Documents: none named
+Retrospective:
+- Went well: the count test failed first, then passed
+- Cost a round: none
+- Proposed lesson: none
 Next: review the branch, push, open the pull request"
 report() {
     printf '%s\n' "$block" |
@@ -87,9 +91,23 @@ expect "report: EXPORTS set, file named by timestamp and id" "report=$first" "$(
 expect "report: the file holds the block" yes "$(printf '%s\n' "$block" | cmp -s - "$first" && echo yes)"
 expect "report: a missing exports folder prints the block" yes \
     "$(report EXPORTS="$work/absent" | grep -q '^Next: review the branch' && echo yes)"
-block=$(printf '%s\n' "$block" | grep -v '^Gates:')
+block=$(printf '%s\n' "$block" | grep -v '^Retrospective:')
 expect "report: a block missing a field is refused" yes \
-    "$(report EXPORTS="$exports" | grep -q 'no line starts with Gates:' && echo yes)"
+    "$(report EXPORTS="$exports" | grep -q 'no line starts with Retrospective:' && echo yes)"
+
+# build-item.sh version: one line when the marketplace's manifest is newer than the installed one,
+# silent when they match. A stub curl serves the marketplace's manifest from $latest.
+mkdir -p "$work/bin"
+cat >"$work/bin/curl" <<'SH'
+#!/bin/bash
+cat "$latest"
+SH
+chmod +x "$work/bin/curl"
+version() { PATH="$work/bin:$PATH" latest=$1 bash "$build" version 2>&1 || true; }
+expect "version: current, silent" "" "$(version "$root/.claude-plugin/plugin.json")"
+printf '{ "version": "99.0.0" }\n' >"$work/latest.json"
+expect "version: behind, one line" yes \
+    "$(version "$work/latest.json" | grep -q 'the marketplace has 99.0.0' && echo yes)"
 
 # check_private.sh: passes with no terms, fails on a term in a file or an unpushed commit.
 repo=$work/repo
