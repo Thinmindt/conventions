@@ -19,6 +19,17 @@ pushes, opens the pull request and merges; the merge is the deploy, the way the 
 
 The item id is the argument: `/build-item bird-counter-7`. One item, one session.
 
+## Check the plugin
+
+```
+bash ${CLAUDE_SKILL_DIR}/build-item.sh version
+```
+
+It compares the installed plugin's version with the marketplace's latest. It is silent when they
+match. When the installed copy is behind, it prints one line with the two versions and the update
+commands; pass that line to the owner and go on. If the latest cannot be read, say so in one line
+and go on.
+
 ## Find the item
 
 ```
@@ -85,6 +96,11 @@ the gates again.
 
 ## Review
 
+Before each review, write the evidence map: one row per criterion, saying met or not met and
+where that shows (a test by name, a file and line, a command and its output). A row with no
+evidence is not met. After each fix, recheck every row, not only the ones the fix was for; a fix
+can break a criterion that was met. The report's Criteria lines are the map's final state.
+
 Hand the work to the `item-reviewer` agent, which runs in a fresh context with read-only tools and
 no memory of the build's reasoning. Its prompt carries, verbatim: the item's criteria, scope and
 definition of done; the rows of `review-lessons.md`; the gates' output; what the build observed
@@ -111,6 +127,14 @@ repository's pull request template, with the gates' run as command → result; t
 with the diff, and the report's Next line points to it. After the last round it is written fresh,
 not patched, for a reader with 60 seconds: one fact per bullet, each fact once, no build history.
 
+## Retrospective
+
+The last build step, however the build ended, is the retrospective. It has three lines, each one
+line or "none": what went well; what cost a round (a review fail, a gate fail, a stop) and why; and
+one proposed lesson, written as a rule a later build can follow, in the shape of a
+`review-lessons.md` row. It goes in the report's Retrospective field. The proposed lesson is the
+Project Manager's to accept into `review-lessons.md`; the builder never writes it there.
+
 ## Report
 
 The session ends with this block, however it ended: a pass, a third fail, or a stop before the
@@ -124,12 +148,16 @@ Build report, <item-id>
 Branch: <branch> at <short sha>, <n> commits on <default branch>
 Rounds: <n> of 3; verdict: pass | fail
 Criteria:
-1. met | not met — <one line>
+1. met | not met — <the evidence map's row: where it shows>
 2. ...
 Gates: <command> pass | fail; <command> pass | fail
 Lessons: kept | broken: <rule>
 Out of scope, seen: <one line each, or none>
 Documents: <which the item's definition of done named, updated | not updated: why>
+Retrospective:
+- Went well: <one line, or none>
+- Cost a round: <one line, or none>
+- Proposed lesson: <one rule, or none>
 Next: review the branch, push, open the pull request (body: <path>) | stopped: <reason>
 REPORT
 ```
