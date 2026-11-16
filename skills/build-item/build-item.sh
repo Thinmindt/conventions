@@ -1,4 +1,6 @@
 #!/bin/bash
+# version: says in one line when the installed plugin is behind the marketplace's latest, which is
+#        the manifest on its repository's default branch; silent when it is current.
 # locate <item-id>: prints the item's file and its project's documents in the Project Manager's
 #        workbench, and refuses an item whose state is not ToDo or In progress.
 # gates: runs the repository's own gate, scripts/check.sh.
@@ -11,7 +13,17 @@
 set -euo pipefail
 
 # The lines every Build report starts with, after its "Build report, <item-id>" title.
-report_fields=("Branch:" "Rounds:" "Criteria:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Next:")
+report_fields=("Branch:" "Rounds:" "Criteria:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Retrospective:" "Next:")
+
+# The value of one string key in the plugin manifest on stdin.
+manifest_value() {
+    sed -n "s/.*\"$1\": *\"\([^\"]*\)\".*/\1/p"
+}
+
+# Whether version $1 is older than version $2.
+behind() {
+    [ "$1" != "$2" ] && [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$1" ]
+}
 
 # The timestamp that names a report file. SOURCE_DATE_EPOCH fixes it, for tests.
 stamp() {
@@ -55,6 +67,15 @@ frontmatter() {
 }
 
 case ${1:-} in
+version)
+    manifest=$(dirname "$0")/../../.claude-plugin/plugin.json
+    installed=$(manifest_value version <"$manifest")
+    repository=$(manifest_value repository <"$manifest")
+    latest=$(curl -fsSL "$repository/raw/HEAD/.claude-plugin/plugin.json" | manifest_value version)
+    if behind "$installed" "$latest"; then
+        echo "conventions $installed is installed and the marketplace has $latest: run claude plugin marketplace update conventions, then claude plugin update conventions@conventions"
+    fi
+    ;;
 locate)
     id=${2:-}
     [ -n "$id" ] || { echo "usage: build-item.sh locate <item-id>" >&2; exit 2; }
@@ -114,7 +135,7 @@ report)
     echo "report=$file"
     ;;
 *)
-    echo "usage: build-item.sh locate <item-id> | gates | report <item-id>" >&2
+    echo "usage: build-item.sh version | locate <item-id> | gates | report <item-id>" >&2
     exit 2
     ;;
 esac
