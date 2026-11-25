@@ -19,7 +19,8 @@ Three skills loaded when the work calls for them, and one the owner invokes:
   `check_private.sh`, the privacy check every public project copies into `scripts/` unchanged; a
   project adds its own terms with `scripts/private_terms.sh`.
 
-- **build-item** — `/build-item <item-id>`, the owner's side of the loop with their Project
+- **build-item** — `/build-item <item-id>`, or the owner asking Claude to build an item by its id
+  (never on Claude's own initiative), the owner's side of the loop with their Project
   Manager agent: it reads one agreed work item from the Project Manager's workbench, builds it to
   its acceptance criteria on a branch named for it in the current checkout, runs the repository's
   gates, hands the diff to `agents/item-reviewer.md`, a fresh read-only reviewer that returns a
