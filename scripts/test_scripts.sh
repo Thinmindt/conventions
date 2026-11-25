@@ -31,6 +31,37 @@ echo "$(($(date +%s) - 40 * 86400)) 2000-01-01" >"$stamp"
 expect "doc-audit: 40 days old, reminder" yes "$(bash "$audit" check | grep -q '40 days ago' && echo yes)"
 unset CLAUDE_PROJECT_DIR
 
+# doc-audit.sh key: every spelling of one Windows path names one stamp. Git Bash's cygpath does the
+# rewrite on Windows; the plain fallback does it elsewhere, and leaves a POSIX path as it was.
+stamp_key() { bash "$audit" key "$1"; }
+expect 'doc-audit key: C:\X' C--Nanoclaw "$(stamp_key 'C:\Nanoclaw')"
+expect 'doc-audit key: C:/X' C--Nanoclaw "$(stamp_key 'C:/Nanoclaw')"
+expect 'doc-audit key: /c/X' C--Nanoclaw "$(stamp_key /c/Nanoclaw)"
+expect 'doc-audit key: c:\X' C--Nanoclaw "$(stamp_key 'c:\Nanoclaw')"
+if ! command -v cygpath >/dev/null; then
+    expect "doc-audit key: a POSIX path keeps its key" -home-me-project "$(stamp_key /home/me/project)"
+fi
+
+# Regression, git-bash-mark-unseen-by-hook: a mark run from Git Bash wrote -c-Nanoclaw while the
+# SessionStart hook, given C:\Nanoclaw, read C--Nanoclaw, so the audit stayed due.
+stamps=$XDG_STATE_HOME/conventions/doc-audit
+CLAUDE_PROJECT_DIR=/c/Nanoclaw bash "$audit" mark >/dev/null
+expect "doc-audit regression: git-bash-mark-unseen-by-hook" yes \
+    "$([ -f "$stamps/$(stamp_key 'C:\Nanoclaw')" ] && [ ! -f "$stamps/-c-Nanoclaw" ] && echo yes)"
+
+# On Windows, the same end to end: mark from Git Bash, check as the hook does, and a stamp
+# written under the old Git Bash name still counts.
+if command -v cygpath >/dev/null; then
+    mkdir -p "$work/winproject/docs" "$work/legacy/docs"
+    CLAUDE_PROJECT_DIR=$work/winproject bash "$audit" mark >/dev/null
+    expect "doc-audit: marked from Git Bash, seen by the hook" "" \
+        "$(CLAUDE_PROJECT_DIR=$(cygpath -w "$work/winproject") bash "$audit" check)"
+    legacy=$(cygpath -m "$work/legacy" | sed 's|^\(.\):|/\L\1|; s|[^A-Za-z0-9._-]|-|g')
+    echo "$(date +%s) $(date +%F)" >"$stamps/$legacy"
+    expect "doc-audit: a stamp under the old Git Bash name counts" "" \
+        "$(CLAUDE_PROJECT_DIR=$(cygpath -w "$work/legacy") bash "$audit" check)"
+fi
+
 # build-item.sh locate: needs a workbench path, finds an item by id, refuses one that is not
 # ToDo or In progress. gates: runs scripts/check.sh, fails when there is nothing to run.
 build=$root/skills/build-item/build-item.sh
