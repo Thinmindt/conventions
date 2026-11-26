@@ -4,6 +4,8 @@
 # locate <item-id>: prints the item's file and its project's documents in the Project Manager's
 #        workbench, and refuses an item whose state is not ToDo or In progress.
 # gates: runs the repository's own gate, scripts/check.sh.
+# cites [<commit>]: checks every file:line in the text on stdin against the commit (HEAD by
+#        default): the file is tracked, the path names one file, the lines exist.
 # report <item-id>: reads the Build report on stdin and writes it to
 #        <exports>/builds/<timestamp>-<item-id>.md, where the Project Manager reads it. Without an
 #        exports path it prints the block and exits non-zero, so the owner can paste it instead.
@@ -13,7 +15,7 @@
 set -euo pipefail
 
 # The lines every Build report starts with, after its "Build report, <item-id>" title.
-report_fields=("Branch:" "Rounds:" "Criteria:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Retrospective:" "Next:")
+report_fields=("Branch:" "Rounds:" "Criteria:" "Practices:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Retrospective:" "Next:")
 
 # The value of one string key in the plugin manifest on stdin.
 manifest_value() {
@@ -105,6 +107,9 @@ gates)
     echo "== bash scripts/check.sh"
     bash scripts/check.sh
     ;;
+cites)
+    python3 -I "$(dirname "$0")/cites.py" "${@:2}"
+    ;;
 report)
     id=${2:-}
     [ -n "$id" ] || { echo "usage: build-item.sh report <item-id> < report" >&2; exit 2; }
@@ -135,7 +140,7 @@ report)
     echo "report=$file"
     ;;
 *)
-    echo "usage: build-item.sh version | locate <item-id> | gates | report <item-id>" >&2
+    echo "usage: build-item.sh version | locate <item-id> | gates | cites [<commit>] | report <item-id>" >&2
     exit 2
     ;;
 esac
