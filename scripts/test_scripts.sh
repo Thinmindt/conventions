@@ -126,6 +126,20 @@ block=$(printf '%s\n' "$block" | grep -v '^Retrospective:')
 expect "report: a block missing a field is refused" yes \
     "$(report EXPORTS="$exports" | grep -q 'no line starts with Retrospective:' && echo yes)"
 
+# build-item.sh cites: every file:line on stdin names one tracked file at the commit and lines it has.
+cited=$work/cited
+mkdir -p "$cited/src" "$cited/tests"
+git -C "$cited" init -q
+printf 'one\ntwo\nthree\n' >"$cited/src/count.py"
+printf 'one\n' >"$cited/tests/count.py"
+git -C "$cited" add -A
+git -C "$cited" -c user.name=Tester -c user.email=tester@example.org commit -q -m "first"
+cites() { (cd "$cited" && printf '%s\n' "$1" | bash "$build" cites >/dev/null 2>&1 && echo pass || echo fail); }
+expect "cites: a full path and a range that exist" pass "$(cites 'made true at src/count.py:2-3')"
+expect "cites: a file not tracked" fail "$(cites 'shown at src/absent.py:1')"
+expect "cites: a line past the end" fail "$(cites 'shown at src/count.py:4')"
+expect "cites: a short path naming two files" fail "$(cites 'shown at count.py:1')"
+
 # build-item.sh version: one line when the marketplace's manifest is newer than the installed one,
 # silent when they match. A stub curl serves the marketplace's manifest from $latest.
 mkdir -p "$work/bin"
