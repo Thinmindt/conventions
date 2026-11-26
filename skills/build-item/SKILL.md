@@ -1,6 +1,6 @@
 ---
 name: build-item
-description: Build one agreed work item from the owner's Project Manager workbench, in the current checkout. Covers locating the item by its id, building to its acceptance criteria on a branch named for it, running the repository's gates, handing the diff to a fresh read-only reviewer with the criteria and the review lessons, looping on a fail at most three times, and ending with a build report in a fixed shape, written to a dated file the Project Manager reads. Use when the owner asks for an item to be built by its id, with /build-item or in words ("build nanoclaw-103", "run build-item on it"). Not for a change that has no item, not on the model's own initiative (naming the next item is not asking for its build), not on a schedule, and never started from another skill.
+description: Build one agreed work item from the owner's Project Manager workbench, in the current checkout. Covers locating the item by its id, building to its acceptance criteria on a branch named for it, running the repository's gates, handing the diff to fresh read-only reviewers (one for the criteria and the review lessons, a panel of lenses for practice, a verifier that tries to refute the panel), looping on a fail at most three times, and ending with a build report in a fixed shape, written to a dated file the Project Manager reads. Use when the owner asks for an item to be built by its id, with /build-item or in words ("build nanoclaw-103", "run build-item on it"). Not for a change that has no item, not on the model's own initiative (naming the next item is not asking for its build), not on a schedule, and never started from another skill.
 argument-hint: <item-id>
 allowed-tools: Bash(bash ${CLAUDE_SKILL_DIR}/build-item.sh *)
 ---
@@ -45,7 +45,10 @@ ready, and the session ends with that message.
 
 Read, in this order: the item; the project's `state.md`, `architecture.md`, `goals.md` and
 `decisions.md`; `review-lessons.md`; the project's row in `projects.md`, which says how it ships
-and which checkout it is. If the current checkout is not that project, stop and say so.
+and which checkout it is; the reports the item links, such as a scope verdict or a design read;
+and the project's `known-gaps.md` when it keeps one (a row per known gap: what it is, the file and
+line it rests on, what would close it). If the current checkout is not that project, stop and say
+so.
 
 The criteria are the specification. The scope says what the diff may touch and what it leaves
 alone. The definition of done names the gates and the documents. Everything else in the item is
@@ -96,27 +99,74 @@ the gates again.
 
 ## Review
 
-Before each review, write the evidence map: one row per criterion, saying met or not met and
-where that shows (a test by name, a file and line, a command and its output). A row with no
-evidence is not met. After each fix, recheck every row, not only the ones the fix was for; a fix
-can break a criterion that was met. The report's Criteria lines are the map's final state.
+Two questions, asked by separate readers and never merged: does the diff do what the item says,
+and does it do it the way the project's standards and sound practice ask. A pass on one never
+covers a fail on the other.
 
-Hand the work to the `item-reviewer` agent, which runs in a fresh context with read-only tools and
-no memory of the build's reasoning. Its prompt carries, verbatim: the item's criteria, scope and
-definition of done; the rows of `review-lessons.md`; the gates' output; what the build observed
-of runtime state; the pull request body, when there is one; the base commit; and the diff,
-`git diff <base>...HEAD`. It returns a verdict in a fixed shape (see
-[../../agents/item-reviewer.md](../../agents/item-reviewer.md)): pass or fail, each criterion met
-or not with where it looked, simplicity kept or broken, each lesson kept or broken, a numbered
-blocking list.
+### The evidence map
 
-A round is one build, its gates, the cut and one review. On a fail, fix only what the blocking list
-names, run the gates and the cut again, and review again. Three reviews at most. After the third
-fail, stop: no more edits, and the report says what the reviewer could not accept and why the build
-could not satisfy it. The owner reads that and decides, which is why the limit exists: a loop that
-keeps going past three rounds is building something the criteria do not describe.
+Before each review, write the evidence map: one row per criterion, saying met or not met, where
+the diff makes it true, where that shows (a test by name, a file and line, a command and its
+output), and the run where that test failed before the change, or why it cannot fail (a document
+criterion). A row with no evidence is not met. Check the map's citations against the branch:
 
-The reviewer's model is set in `agents/item-reviewer.md`; it inherits the session's by default,
+```
+bash ${CLAUDE_SKILL_DIR}/build-item.sh cites <<'MAP'
+<the evidence map>
+MAP
+```
+
+An unresolved citation is fixed before the review. After each fix, recheck every row, not only
+the ones the fix was for; a fix can break a criterion that was met. The report's Criteria lines
+are the map's final state.
+
+### The first round
+
+Three kinds of reader, each a fresh agent with read-only tools and no memory of the build's
+reasoning. The criteria reviewer and the panel start together; the verifier starts when the panel
+is done.
+
+- **The criteria reviewer**, [`item-reviewer`](../../agents/item-reviewer.md). Its prompt carries,
+  verbatim: the item's criteria, scope and definition of done; the rows of `review-lessons.md`;
+  the gates' output; the evidence map; what the build observed of runtime state; the rows of
+  `known-gaps.md` whose file the diff touches; the pull request body, when there is one; the base
+  commit; and the diff, `git diff <base>...HEAD`. It returns pass or fail, each criterion met or
+  not with where it looked, and a numbered blocking list.
+- **The panel**, one [`practice-reviewer`](../../agents/practice-reviewer.md) per seated lens.
+  The lenses are the files in [lenses/](lenses/). Seat `testing` always, and each other lens
+  whose Seat line the diff meets; write one line per seat saying what in the diff seats it, and
+  one line for any lens left out that came close. A lens seated with nothing to read is noise.
+  Each prompt carries, verbatim: the lens file; the item's summary, criteria and scope; the
+  project's standards (its agent guide, `docs/STYLE.md` and what it links); the risks and "should
+  not touch" lines of the item's scope verdict and the touched rows of `known-gaps.md`, when
+  there are any; the base commit; and the diff.
+- **The verifier**, [`finding-verifier`](../../agents/finding-verifier.md), given every panel
+  finding, the item's criteria and scope, the project's standards, the base commit and the diff.
+  It tries to refute each finding and labels each that stands: blocking (on a line the diff adds
+  or changes, with a fix inside the scope), out of scope, or a note.
+
+### What blocks
+
+The round fails when the criteria reviewer says fail or the verifier labels a finding blocking.
+A blocking finding about behavior is tested before it is fixed: write the test the verifier named
+and run it on the unfixed code. If it fails, the finding is confirmed; fix it and keep the test.
+If it passes, the finding was wrong; the report says so with the test's name, and the test goes
+unless a criterion needs it. The builder does not argue a label down; only a test changes one.
+Findings labeled out of scope go in the report under "Out of scope, seen"; notes are not carried.
+
+### Later rounds
+
+A round is one build, its gates, the cut and one review. On a fail, fix only what the blocking
+lists name, run the gates and the cut again, recheck the map, and review again. From the second
+round, the criteria reviewer reads the whole diff as before, and the panel is only the lenses that
+had a blocking finding, each given its earlier findings and the fixes,
+`git diff <last reviewed commit>..HEAD`; the verifier reads what they return. Three reviews at
+most. After the third fail, stop: no more edits, and the report says what the reviewers could not
+accept and why the build could not satisfy it. The owner reads that and decides, which is why the
+limit exists: a loop that keeps going past three rounds is building something the criteria do not
+describe.
+
+Each reader's model is set in its file under `agents/`; each inherits the session's by default,
 and the owner may pin a stronger one there. A verdict is short and should be strict.
 
 ## Pull request body
@@ -150,6 +200,7 @@ Rounds: <n> of 3; verdict: pass | fail
 Criteria:
 1. met | not met — <the evidence map's row: where it shows>
 2. ...
+Practices: <lenses seated>; <n> stood, <n> blocking, fixed | open; <n> refuted
 Gates: <command> pass | fail; <command> pass | fail
 Lessons: kept | broken: <rule>
 Out of scope, seen: <one line each, or none>

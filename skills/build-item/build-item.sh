@@ -15,7 +15,7 @@
 set -euo pipefail
 
 # The lines every Build report starts with, after its "Build report, <item-id>" title.
-report_fields=("Branch:" "Rounds:" "Criteria:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Retrospective:" "Next:")
+report_fields=("Branch:" "Rounds:" "Criteria:" "Practices:" "Gates:" "Lessons:" "Out of scope, seen:" "Documents:" "Retrospective:" "Next:")
 
 # The value of one string key in the plugin manifest on stdin.
 manifest_value() {

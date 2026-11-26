@@ -23,12 +23,17 @@ Three skills loaded when the work calls for them, and one the owner invokes:
   (never on Claude's own initiative), the owner's side of the loop with their Project
   Manager agent: it reads one agreed work item from the Project Manager's workbench, builds it to
   its acceptance criteria on a branch named for it in the current checkout, runs the repository's
-  gates, hands the diff to `agents/item-reviewer.md`, a fresh read-only reviewer that returns a
-  verdict in a fixed shape, loops on a fail at most three times, and ends with a build report
-  written to a dated file in the exports folder the Project Manager reads. It never pushes, opens
-  a pull request or writes to the workbench. The workbench and exports paths live in `WORKBENCH`
-  and `EXPORTS`, or in `${XDG_CONFIG_HOME:-~/.config}/conventions/workbench` and
-  `.../conventions/exports`, one file each, outside every project.
+  gates, and hands the diff to fresh read-only readers: `agents/item-reviewer.md` judges it against
+  the criteria, a panel of `agents/practice-reviewer.md`, one per lens in
+  `skills/build-item/lenses/` that the diff calls for, reads it for practice, and
+  `agents/finding-verifier.md` tries to refute what the panel found. It loops on a fail at most
+  three times, and ends with a build report written to a dated file in the exports folder the
+  Project Manager reads. It never pushes, opens a pull request or writes to the workbench. The
+  workbench and exports paths live in `WORKBENCH` and `EXPORTS`, or in
+  `${XDG_CONFIG_HOME:-~/.config}/conventions/workbench` and `.../conventions/exports`, one file
+  each, outside every project. The lenses are rewritten for a diff from the expert lenses of
+  NanoClaw's architect agent template, and `cites.py` is a smaller form of that agent's citation
+  check.
 
 A session-start hook reminds Claude to offer the audit when a project with a `CLAUDE.md` or a
 `docs/` directory has not had one for 30 days (`DOC_AUDIT_DAYS` changes that). The date of the

@@ -101,6 +101,7 @@ Branch: item/bird-counter-7 at abc1234, 2 commits on main
 Rounds: 1 of 3; verdict: pass
 Criteria:
 1. met — the count is printed
+Practices: testing, design; 2 stood, 1 blocking, fixed; 1 refuted
 Gates: bash scripts/check.sh pass
 Lessons: kept
 Out of scope, seen: none
